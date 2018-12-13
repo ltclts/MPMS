@@ -54,7 +54,7 @@
 <script src="/static/js/auth/demo-1.js"></script>
 <script>
     let login = {
-        urlLogin: "/api/user/login",
+        urlLogin: {{.ApiUriLogin}},
         _xsrf: $('meta[name="_xsrf"]').attr('content'),
         $email: $('input[name="email"]'),
         $password: $('input[name="password"]'),

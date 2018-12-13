@@ -4,6 +4,7 @@ import (
 	"MPMS/controllers"
 	"MPMS/controllers/api"
 	"MPMS/filters"
+	"MPMS/routers/uris"
 	"github.com/astaxie/beego"
 )
 
@@ -17,16 +18,16 @@ func init() {
 	/**
 	主页面
 	*/
-	beego.Router("/", &controllers.IndexController{})
+	beego.Router(uris.HtmlUriIndex, &controllers.IndexController{})
 
 	/**
 	页面
 	*/
-	beego.Router("/user/login", &controllers.UserController{}, "get:Login")
+	beego.Router(uris.HtmlUriLogin, &controllers.UserController{}, "get:Login")
 
 	/**
 	接口
 	*/
-	beego.Router("/api/user/login", &api.UserApiController{}, "post:Login")
+	beego.Router(uris.ApiUriLogin, &api.UserApiController{}, "post:Login")
 
 }

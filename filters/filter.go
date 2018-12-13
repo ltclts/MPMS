@@ -1,6 +1,7 @@
 package filters
 
 import (
+	"MPMS/routers/uris"
 	"MPMS/session"
 	"fmt"
 	"github.com/astaxie/beego/context"
@@ -17,7 +18,7 @@ func FilterUser(ctx *context.Context) {
 	can := func(uri string) bool {
 		fmt.Println(uri)
 		//特殊路由 可以不需要登录
-		exceptUris := []string{"/user/login", "/api/user/login"}
+		exceptUris := []string{uris.HtmlUriLogin, uris.ApiUriLogin}
 		for _, exceptUri := range exceptUris {
 			if uri == exceptUri || strings.Contains(uri, exceptUri+"?") {
 				return true
@@ -31,6 +32,6 @@ func FilterUser(ctx *context.Context) {
 		if strings.ToLower(ctx.Request.Method) == "get" {
 			ctx.Output.Session(session.RequestUri, uri)
 		}
-		ctx.Redirect(302, "/user/login")
+		ctx.Redirect(302, uris.HtmlUriLogin)
 	}
 }

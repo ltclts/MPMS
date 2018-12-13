@@ -2,6 +2,7 @@ package api
 
 import (
 	"MPMS/models"
+	"MPMS/routers/uris"
 	"MPMS/session"
 	"MPMS/structure"
 )
@@ -47,7 +48,7 @@ func (u *UserApiController) Login() {
 	if requestUri != nil {
 		redirect = requestUri.(string)
 	} else {
-		redirect = "/"
+		redirect = uris.HtmlUriIndex
 	}
 
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.Map{"uri": redirect}})
