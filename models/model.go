@@ -1,12 +1,12 @@
 package models
 
 import (
+	"MPMS/helper"
 	"MPMS/structure"
 	"database/sql"
 	"fmt"
 	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
-	"qiniupkg.com/x/errors.v7"
 	"strings"
 )
 
@@ -132,7 +132,7 @@ func (b *model) renderFields(fields []string, getFieldsMap func() structure.Map)
 	for _, field := range fields {
 		addr := fieldsMap[field]
 		if addr == nil {
-			return "", nil, errors.New("invalid key " + field)
+			return "", nil, helper.ThrowNewError("invalid key " + field)
 		}
 
 		fieldsToReturn = append(fieldsToReturn, "`"+field+"`")

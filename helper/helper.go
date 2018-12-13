@@ -3,6 +3,7 @@ package helper
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -35,4 +36,8 @@ func Md5(str string) string {
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(str))
 	return hex.EncodeToString(md5Ctx.Sum(nil))
+}
+
+func ThrowNewError(msg string) error {
+	return errors.New(msg)
 }
