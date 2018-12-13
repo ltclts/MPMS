@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/static/components/layui/css/layui.css">
     <link rel="stylesheet" href="/static/components/zui/lib/chosen/chosen.css">
     <link rel="stylesheet" href="/static/components/zui/lib/datetimepicker/datetimepicker.min.css">
-    <link rel="stylesheet"href="/static/components/zui/lib/uploader/zui.uploader.min.css">
+    <link rel="stylesheet" href="/static/components/zui/lib/uploader/zui.uploader.min.css">
     <link rel="stylesheet" href="/static/css/index.css">
     <meta name="_xsrf" content="{{.xsrfdata}}" />
     {{.HtmlCss}}

@@ -9,19 +9,24 @@ import (
 
 func init() {
 
-
 	/**
-		中间件
-	 */
+	中间件
+	*/
 	beego.InsertFilter("/*", beego.BeforeRouter, filters.FilterUser)
 
 	/**
-		页面
-	 */
+	主页面
+	*/
+	beego.Router("/", &controllers.IndexController{})
+
+	/**
+	页面
+	*/
 	beego.Router("/user/login", &controllers.UserController{}, "get:Login")
 
 	/**
-		接口
-	 */
+	接口
+	*/
 	beego.Router("/api/user/login", &api.UserApiController{}, "post:Login")
+
 }

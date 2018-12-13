@@ -21,6 +21,9 @@ type model struct {
 	UpdatedAt string
 }
 
+const UNDELETED = 0
+const DELETED = 1
+
 var db *sql.DB
 var tx *sql.Tx        //事务使用
 var userTrans = false //是否开启事务
@@ -34,7 +37,7 @@ func (b *model) InitDB() (*sql.DB, error) {
 		return db, err
 	}
 	fmt.Println("init -- db")
-	db, err = sql.Open(beego.AppConfig.String("driverName"), beego.AppConfig.String("dataSourceName"))
+	db, err = sql.Open(beego.AppConfig.String("DBDriverName"), beego.AppConfig.String("DBDataSourceName"))
 	if err != nil {
 		return db, err
 	}

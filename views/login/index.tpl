@@ -99,6 +99,7 @@
                     _this.showErrMsg(resp.msg);
                     return false;
                 }
+                location.href = resp.info.uri;
             });
         }
 
