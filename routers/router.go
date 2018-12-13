@@ -8,6 +8,14 @@ import (
 	"github.com/astaxie/beego"
 )
 
+type Route struct {
+	Uri                 string
+	ControllerInterface beego.ControllerInterface
+	Method              string
+}
+
+var Routes []Route
+
 func init() {
 
 	/**
@@ -16,18 +24,13 @@ func init() {
 	beego.InsertFilter("/*", beego.BeforeRouter, filters.FilterUser)
 
 	/**
-	主页面
+	路由设定
 	*/
-	beego.Router(uris.HtmlUriIndex, &controllers.IndexController{})
+	Routes = append(Routes, Route{uris.HtmlUriIndex, &controllers.IndexController{}, "get:Get"})
+	Routes = append(Routes, Route{uris.HtmlUriLogin, &controllers.UserController{}, "get:Login"})
+	Routes = append(Routes, Route{uris.ApiUriLogin, &api.UserApiController{}, "post:Login"})
 
-	/**
-	页面
-	*/
-	beego.Router(uris.HtmlUriLogin, &controllers.UserController{}, "get:Login")
-
-	/**
-	接口
-	*/
-	beego.Router(uris.ApiUriLogin, &api.UserApiController{}, "post:Login")
-
+	for _, route := range Routes {
+		beego.Router(route.Uri, route.ControllerInterface, route.Method)
+	}
 }
