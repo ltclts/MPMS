@@ -1,8 +1,9 @@
 package test
 
 import (
-	"MPMS/helper"
+	"MPMS/models"
 	_ "MPMS/routers"
+	"MPMS/structure"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -39,8 +40,8 @@ func TestBeego(t *testing.T) {
 }
 
 func TestHelper(t *testing.T) {
-	str := helper.GetRandomStrBy(6)
-	fmt.Println(str)
-	fmt.Println(helper.Md5(str))
-	fmt.Println(helper.Now())
+	user := models.User{}
+	fmt.Println(user)
+	users, err := user.Select([]string{}, structure.Map{})
+	fmt.Println(users, err)
 }

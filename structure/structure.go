@@ -1,7 +1,5 @@
 package structure
 
-
-
 type Response struct {
 	Error int8   `json:"error"`
 	Msg   string `json:"msg"`
@@ -9,3 +7,5 @@ type Response struct {
 }
 
 type Map map[string]interface{}
+
+type Array []interface{}
