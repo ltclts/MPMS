@@ -43,3 +43,17 @@ CREATE TABLE `menu` (
 PRIMARY KEY (`id`),
 KEY `ids_type_parent_id` (`type`,`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='菜单表';
+
+CREATE TABLE `flow` (
+`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+`refer_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相关id',
+`refer_type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '相关类型',
+`status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '操作',
+`content` text NOT NULL DEFAULT '' COMMENT '变更内容',
+`is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+`creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+`created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
+`updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
+PRIMARY KEY (`id`),
+KEY `ids_refer_id` (`refer_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='通用流水表';

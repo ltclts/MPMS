@@ -26,6 +26,7 @@ const (
 	ConfigTableName = "config"
 	UserTableName   = "user"
 	MenuTableName   = "menu"
+	FlowTableName   = "flow"
 
 	//删除标志
 	UnDeleted = 0
@@ -158,7 +159,7 @@ func (b *model) renderWhere(where structure.Map) (string, structure.Array) {
 	var whereValue structure.Array
 	whereIndex = append(whereIndex, " 1=1 ")
 	for i, v := range where {
-		whereIndex = append(whereIndex, " `"+i+"`= ? ")
+		whereIndex = append(whereIndex, fmt.Sprintf(" `%s`= ? ", i))
 		whereValue = append(whereValue, v)
 	}
 	return strings.Join(whereIndex, "and"), whereValue
@@ -175,4 +176,36 @@ func (b *model) QuickQueryWithExtra(fields []string, getFieldsMap func() structu
 	}
 	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
 	return rows, fieldsAddr, nil
+}
+
+func (b *model) InsertExec(fieldToValueMap structure.Map, table string) (uint, error) {
+
+	//加入默认值
+	extraFields := structure.Map{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
+	for field, val := range extraFields {
+		if fieldToValueMap[field] == nil {
+			fieldToValueMap[field] = val
+		}
+	}
+
+	var fields []string
+	var alternatives []string
+	var values structure.Array
+	for field, value := range fieldToValueMap {
+		fields = append(fields, fmt.Sprintf("`%s`", field))
+		alternatives = append(alternatives, "?")
+		values = append(values, value)
+	}
+
+	result, err := b.Exec(fmt.Sprintf("INSERT INTO `%s`(%s) VALUES (%s)", table, strings.Join(fields, ","), strings.Join(alternatives, ",")), values...)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(id), err
 }
