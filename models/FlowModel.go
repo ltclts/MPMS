@@ -9,8 +9,7 @@ import (
 通用流水 模型
 */
 type Flow struct {
-	Id        uint
-	ReferId   uint
+	ReferId   int64
 	ReferType uint8
 	Status    uint8
 	Content   string
@@ -21,7 +20,7 @@ type Flow struct {
 获取流水信息
 */
 func (f *Flow) Select(fields []string, where structure.Map) ([]Flow, error) {
-	rows, fieldsAddr, err := f.QuickQuery(fields, f.getFieldsMap, where, ConfigTableName)
+	rows, fieldsAddr, err := f.QuickQuery(fields, f.getFieldsMap, where, FlowTableName)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +38,7 @@ func (f *Flow) Select(fields []string, where structure.Map) ([]Flow, error) {
 	return flows, err
 }
 
-func (f *Flow) Insert(referId uint, referType uint8, status uint8, creatorId uint, contentMap structure.Map) (uint, error) {
+func (f *Flow) Insert(referId int64, referType uint8, status uint8, creatorId int64, contentMap structure.Map) (int64, error) {
 	content, err := json.Marshal(contentMap)
 	if err != nil {
 		return 0, nil

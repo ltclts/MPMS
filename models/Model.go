@@ -15,18 +15,20 @@ import (
 @author cyu 2018-4-28 16:29:54
 */
 type Model struct {
+	Id        int64
 	IsDeleted uint8
-	CreatorId uint
+	CreatorId int64
 	CreatedAt string
 	UpdatedAt string
 }
 
 const (
 	//表名定义
-	ConfigTableName = "config"
-	UserTableName   = "user"
-	MenuTableName   = "menu"
-	FlowTableName   = "flow"
+	ConfigTableName   = "config"
+	UserTableName     = "user"
+	MenuTableName     = "menu"
+	FlowTableName     = "flow"
+	RelationTableName = "relation"
 
 	//删除标志
 	UnDeleted = 0
@@ -130,6 +132,47 @@ func (b *Model) Exec(sql string, args ...interface{}) (sql.Result, error) {
 	return db.Exec(sql, args...)
 }
 
+func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
+	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
+}
+
+func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
+	whereStr, whereValue := b.renderWhere(where)
+	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
+	if err != nil {
+		return nil, nil, err
+	}
+	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
+	return rows, fieldsAddr, nil
+}
+
+func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (int64, error) {
+
+	//加入默认值
+	extraFields := structure.Map{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
+	for field, val := range extraFields {
+		if fieldToValueMap[field] == nil {
+			fieldToValueMap[field] = val
+		}
+	}
+
+	var fields []string
+	var alternatives []string
+	var values structure.Array
+	for field, value := range fieldToValueMap {
+		fields = append(fields, fmt.Sprintf("`%s`", field))
+		alternatives = append(alternatives, "?")
+		values = append(values, value)
+	}
+
+	result, err := b.Exec(fmt.Sprintf("INSERT INTO `%s`(%s) VALUES (%s)", table, strings.Join(fields, ","), strings.Join(alternatives, ",")), values...)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.LastInsertId()
+}
+
 func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map) (string, structure.Array, error) {
 
 	var fieldsToReturn []string
@@ -163,49 +206,4 @@ func (b *Model) renderWhere(where structure.Map) (string, structure.Array) {
 		whereValue = append(whereValue, v)
 	}
 	return strings.Join(whereIndex, "and"), whereValue
-}
-func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
-	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
-}
-
-func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
-	whereStr, whereValue := b.renderWhere(where)
-	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
-	if err != nil {
-		return nil, nil, err
-	}
-	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
-	return rows, fieldsAddr, nil
-}
-
-func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (uint, error) {
-
-	//加入默认值
-	extraFields := structure.Map{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
-	for field, val := range extraFields {
-		if fieldToValueMap[field] == nil {
-			fieldToValueMap[field] = val
-		}
-	}
-
-	var fields []string
-	var alternatives []string
-	var values structure.Array
-	for field, value := range fieldToValueMap {
-		fields = append(fields, fmt.Sprintf("`%s`", field))
-		alternatives = append(alternatives, "?")
-		values = append(values, value)
-	}
-
-	result, err := b.Exec(fmt.Sprintf("INSERT INTO `%s`(%s) VALUES (%s)", table, strings.Join(fields, ","), strings.Join(alternatives, ",")), values...)
-	if err != nil {
-		return 0, err
-	}
-
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return uint(id), err
 }

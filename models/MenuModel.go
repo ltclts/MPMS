@@ -8,13 +8,12 @@ import (
 Menu 模型
 */
 type Menu struct {
-	Id       uint
-	ParentId uint
+	ParentId int64
 	Type     uint8
 	Name     string
 	NameEn   string
 	Uri      string
-	Sort     uint
+	Sort     int64
 	Model
 }
 

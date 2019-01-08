@@ -93,7 +93,7 @@
                 url: _this.urlLogin,
                 type: 'post',
                 data: {email: email, password: pwd}
-            }, {loadingText: "正在登录..."}).done(function (resp) {
+            }, {loadingText: "努力登录中..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
                     _this.showErrMsg(resp.msg);

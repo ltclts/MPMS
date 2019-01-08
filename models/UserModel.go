@@ -9,14 +9,13 @@ import (
 user 模型
 */
 type User struct {
-	Id       uint
 	Name     string
 	Email    string
 	Password string
 	Phone    string
 	Type     uint8
 	Status   uint8
-	Sort     int
+	Sort     int64
 	Model
 }
 

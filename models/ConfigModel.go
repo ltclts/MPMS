@@ -8,7 +8,6 @@ import (
 config 模型
 */
 type Config struct {
-	Id      uint
 	Type    uint8
 	Content string
 	Desc    string
