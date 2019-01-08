@@ -2,3 +2,4 @@ MPMS.exe
 .idea/
 tmp/*
 MPMS.exe~
+/static/img/logo.ico*
