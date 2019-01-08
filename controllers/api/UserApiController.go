@@ -40,8 +40,17 @@ func (u *UserApiController) Login() {
 		u.ApiReturn(structure.Response{Error: 5, Msg: "用户名或密码不正确！", Info: structure.Map{}})
 	}
 
+	if user.Status != models.UserStatusInUse {
+		currentStatusName := (user.GetUserStatusToNameMap())[user.Status]
+		if currentStatusName == "" {
+			u.ApiReturn(structure.Response{Error: 6, Msg: "您的账户处于异常状态，请联系管理员！", Info: structure.Map{}})
+		}
+		u.ApiReturn(structure.Response{Error: 6, Msg: "您的账户" + currentStatusName + "，不能进行登陆！", Info: structure.Map{}})
+	}
+
 	u.SetSession(session.UUID, user.Id)
-	u.SetSession(session.UseName, user.Name)
+	u.SetSession(session.UserName, user.Name)
+	u.SetSession(session.UserType, user.Type)
 
 	var redirect string
 	requestUri := u.GetSession(session.RequestUri)
@@ -52,4 +61,11 @@ func (u *UserApiController) Login() {
 	}
 
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.Map{"uri": redirect}})
+}
+
+func (u *UserApiController) Logout() {
+	u.SetSession(session.UUID, nil)
+	u.SetSession(session.UserName, nil)
+	u.SetSession(session.UserType, nil)
+	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.Map{"uri": uris.HtmlUriLogin}})
 }

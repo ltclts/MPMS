@@ -27,7 +27,7 @@ login<header id="global_header" class="bg-primary">
                         </a>
                     </li>
                     <li>
-                        <a title="注销" href="javascript:void(0);">
+                        <a title="注销" href="javascript:void(0);" class="logout">
                             <span id="navMyInfo">
                                 <i class="icon icon-signout"></i>
                                 <span>注销</span>

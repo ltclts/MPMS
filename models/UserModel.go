@@ -20,6 +20,30 @@ type User struct {
 	model
 }
 
+const UserTableName = "user"
+
+const (
+	UserTypeAdmin    = 0 //后台管理员
+	UserTypeCustomer = 1 //用户
+)
+
+const (
+	UserStatusInitial   = 0 //初始状态
+	UserStatusInUse     = 1 //在用状态
+	UserStatusForbidden = 2 //禁用状态
+)
+
+/**
+获取用户状态与名称的映射关系
+*/
+func (u *User) GetUserStatusToNameMap() map[uint8]string {
+	return map[uint8]string{
+		UserStatusInitial:   "未激活",
+		UserStatusInUse:     "已激活",
+		UserStatusForbidden: "已禁用",
+	}
+}
+
 /**
 检查密码是否正确
 */
@@ -32,14 +56,7 @@ func (u *User) CheckPwd(pwd string) bool {
 获取用户信息
 */
 func (u *User) Select(fields []string, where structure.Map) ([]User, error) {
-	whereStr, whereValue := u.renderWhere(where)
-	fieldsStr, fieldsAddr, err := u.renderFields(fields, u.getFieldsMap)
-	if err != nil {
-		return nil, err
-	}
-
-	sqlStr := "SELECT " + fieldsStr + "  FROM `user` where " + whereStr
-	rows, err := u.Query(sqlStr, whereValue...)
+	rows, fieldsAddr, err := u.QuickQuery(fields, u.getFieldsMap, where, UserTableName)
 	if err != nil {
 		return nil, err
 	}

@@ -47,6 +47,10 @@
     </div>
 </div>
 <script src="/static/components/zui/lib/jquery/jquery.js"></script>
+<script src="/static/components/zui/js/zui.min.js"></script>
+<script src="/static/components/zui/lib/datetimepicker/datetimepicker.min.js"></script>
+<script src="/static/components/layui/layui.all.js"></script>
+<script src="/static/js/index.js"></script>
 <script src="/static/js/auth/html5.js"></script>
 <script src="/static/js/auth/TweenLite.min.js"></script>
 <script src="/static/js/auth/EasePack.min.js"></script>
@@ -55,7 +59,6 @@
 <script>
     let login = {
         urlLogin: {{.ApiUriLogin}},
-        _xsrf: $('meta[name="_xsrf"]').attr('content'),
         $email: $('input[name="email"]'),
         $password: $('input[name="password"]'),
         $alert: $('.alert'),
@@ -65,7 +68,6 @@
         },
         render: function () {
             let _this = this;
-            console.log(_this._xsrf);
             $('body').on('click', '.submit', function () {
                 _this.login();
             });
@@ -91,7 +93,6 @@
             $.ajax({
                 url: _this.urlLogin,
                 type: 'post',
-                headers: {'X-Xsrftoken': _this._xsrf},
                 data: {email: email, password: pwd}
             }).done(function (resp) {
                 console.log(resp);

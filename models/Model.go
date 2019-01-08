@@ -155,3 +155,14 @@ func (b *model) renderWhere(where structure.Map) (string, structure.Array) {
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
+
+func (b *model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
+	whereStr, whereValue := b.renderWhere(where)
+	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s", fieldsStr, table, whereStr), whereValue...)
+	return rows, fieldsAddr, nil
+}
