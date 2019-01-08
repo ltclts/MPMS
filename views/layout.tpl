@@ -25,7 +25,7 @@
     <ol class="breadcrumb">
         <li class="active"><i class="icon icon-home"></i>首页</li>
         <li class="active">{{.MenuFirstName}}</li>
-        <li class="active">{{.MenuFirstName}}</li>
+        <li class="active">{{.MenuSecondName}}</li>
     </ol>
 
 {{.LayoutContent}}

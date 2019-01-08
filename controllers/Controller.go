@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"MPMS/models"
 	"MPMS/routers/uris"
 	"MPMS/session"
+	"MPMS/structure"
 	"fmt"
 	"github.com/astaxie/beego"
 )
@@ -12,6 +14,20 @@ import (
 */
 type Controller struct {
 	beego.Controller
+}
+
+func (b *Controller) RenderHtml(title string, pageName string, tplName string, htmlCssName string, scriptsName string, sidebarName string) {
+	b.TplName = tplName
+	b.Data["Title"] = title
+	b.Data["CurrentPageName"] = pageName
+	b.Data["xsrfdata"] = b.XSRFToken()
+	b.Data["ApiUriLogout"] = uris.ApiUriLogout
+	b.Data["CompanyName"] = "两分钱"
+	b.Data["LoginUserName"] = b.GetSession(session.UserName)
+	b.getMenuList()
+	b.Layout = "layout.tpl"
+	b.LayoutSections = map[string]string{"HtmlCss": htmlCssName, "Scripts": scriptsName, "Sidebar": sidebarName}
+	fmt.Println(b.Data)
 }
 
 type dashBoard struct {
@@ -29,20 +45,6 @@ type route struct {
 	Active   bool   `json:"active"`
 }
 
-func (b *Controller) RenderHtml(title string, pageName string, tplName string, htmlCssName string, scriptsName string, sidebarName string) {
-	b.TplName = tplName
-	b.Data["Title"] = title
-	b.Data["CurrentPageName"] = pageName
-	b.Data["xsrfdata"] = b.XSRFToken()
-	b.Data["ApiUriLogout"] = uris.ApiUriLogout
-	b.Data["CompanyName"] = "两分钱"
-	b.Data["LoginUserName"] = b.GetSession(session.UserName)
-	b.getMenuList()
-	b.Layout = "layout.tpl"
-	b.LayoutSections = map[string]string{"HtmlCss": htmlCssName, "Scripts": scriptsName, "Sidebar": sidebarName}
-	fmt.Println(b.Data)
-}
-
 /**
 菜单生成
 */
@@ -51,44 +53,26 @@ func (b *Controller) getMenuList() {
 	var routes []route
 	var currentPageName = b.Data["CurrentPageName"]
 
-	/**
-	财务管理菜单
-	*/
-	routes = []route{}
-	routes = append(routes, route{"财务管理", "/finance", "financeFlow", false})
-	routes = append(routes, route{"类型管理", "/finance/type", "financeType", false})
-	menu = append(menu, dashBoard{"财务管理", "user", routes, false})
-
-	/**
-	系统设置
-	*/
-	routes = []route{}
-	routes = append(routes, route{"角色管理", "", "role", false})
-	routes = append(routes, route{"权限管理", "", "privilege", false})
-	menu = append(menu, dashBoard{"系统设置", "cogs", routes, false})
-
-	/**
-	系统设置
-	*/
-	routes = []route{}
-	routes = append(routes, route{"测试", "/html", "html", false})
-	menu = append(menu, dashBoard{"测试", "cogs", routes, false})
-
-	/**
-	筛选出指定active的链接
-	*/
-	for m, v := range menu {
-		for n, route := range v.Routes {
-			if route.PageName == currentPageName {
-				menu[m].Routes[n].Active = true
-				menu[m].Active = true
-				b.Data["MenuFirstName"] = menu[m].Name
-				b.Data["MenuSecondName"] = menu[m].Routes[n].Name
-				goto end
+	m := models.Menu{}
+	active := false
+	if menuList, e := m.Select([]string{}, structure.Map{"is_deleted": models.UnDeleted, "type": models.MenuTypeFirst}); e == nil {
+		for _, menuItem := range menuList {
+			if menuItemList, e := m.Select([]string{"name", "name_en", "uri"}, structure.Map{"is_deleted": models.UnDeleted, "type": models.MenuTypeSecond, "parent_id": menuItem.Id}); e == nil {
+				routes = []route{}
+				active = false
+				for _, routeItem := range menuItemList {
+					if !active {
+						if active = routeItem.NameEn == currentPageName; active {
+							b.Data["MenuFirstName"] = menuItem.Name
+							b.Data["MenuSecondName"] = routeItem.Name
+						}
+					}
+					routes = append(routes, route{routeItem.Name, routeItem.Uri, routeItem.NameEn, routeItem.NameEn == currentPageName})
+				}
+				menu = append(menu, dashBoard{menuItem.Name, menuItem.Uri, routes, active})
 			}
 		}
 	}
 
-end:
 	b.Data["MenuList"] = menu
 }

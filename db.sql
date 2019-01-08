@@ -27,3 +27,19 @@ CREATE TABLE `config` (
 PRIMARY KEY (`id`),
 KEY `ids_type` (`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='配置表';
+
+CREATE TABLE `menu` (
+`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+`parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父节点id',
+`type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '类型 1-一级菜单 2-二级菜单',
+`name` varchar(100) NOT NULL DEFAULT '' COMMENT '名称',
+`name_en` varchar(100) NOT NULL DEFAULT '' COMMENT '英文名',
+`uri` varchar(100) NOT NULL DEFAULT '' COMMENT '路由或者图标',
+`sort` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+`is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+`creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+`created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
+`updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
+PRIMARY KEY (`id`),
+KEY `ids_type_parent_id` (`type`,`parent_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='菜单表';

@@ -25,6 +25,7 @@ const (
 	//表名定义
 	ConfigTableName = "config"
 	UserTableName   = "user"
+	MenuTableName   = "menu"
 
 	//删除标志
 	UnDeleted = 0
@@ -162,14 +163,16 @@ func (b *model) renderWhere(where structure.Map) (string, structure.Array) {
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
-
 func (b *model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
+	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
+}
+
+func (b *model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
 	whereStr, whereValue := b.renderWhere(where)
 	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s", fieldsStr, table, whereStr), whereValue...)
+	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
 	return rows, fieldsAddr, nil
 }
