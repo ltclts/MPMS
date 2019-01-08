@@ -20,14 +20,12 @@ type User struct {
 	model
 }
 
-const UserTableName = "user"
-
 const (
+	//用户类型定义
 	UserTypeAdmin    = 0 //后台管理员
 	UserTypeCustomer = 1 //用户
-)
 
-const (
+	//用户状态定义
 	UserStatusInitial   = 0 //初始状态
 	UserStatusInUse     = 1 //在用状态
 	UserStatusForbidden = 2 //禁用状态

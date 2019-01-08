@@ -23,7 +23,7 @@ func (u *UserApiController) Login() {
 	}
 
 	user := models.User{}
-	users, err := user.Select([]string{}, structure.Map{"email": param.Email, "is_deleted": models.UNDELETED})
+	users, err := user.Select([]string{}, structure.Map{"email": param.Email, "is_deleted": models.UnDeleted})
 	if err != nil {
 		u.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.Map{}})
 	}

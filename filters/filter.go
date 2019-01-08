@@ -9,9 +9,9 @@ import (
 )
 
 func FilterUser(ctx *context.Context) {
-	ok := false
+	isLogin := false
 	if uuid := ctx.Input.Session(session.UUID); uuid != nil {
-		ok = true
+		isLogin = true
 	}
 
 	uri := ctx.Request.RequestURI
@@ -27,7 +27,8 @@ func FilterUser(ctx *context.Context) {
 		return false
 	}
 
-	if !ok && !can(uri) {
+	//如果未登陆并且路由必须登陆则跳转到登陆
+	if !isLogin && !can(uri) {
 		//链接写入session 为了登陆成功后跳转
 		if strings.ToLower(ctx.Request.Method) == "get" {
 			ctx.Output.Session(session.RequestUri, uri)

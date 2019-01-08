@@ -11,10 +11,9 @@ type Config struct {
 	Id      uint
 	Type    uint8
 	Content string
+	Desc    string
 	model
 }
-
-const ConfigTableName = "config"
 
 /**
 获取配置信息
@@ -46,6 +45,7 @@ func (c *Config) getFieldsMap() structure.Map {
 		"id":         &c.Id,
 		"type":       &c.Type,
 		"content":    &c.Content,
+		"desc":       &c.Desc,
 		"is_deleted": &c.IsDeleted,
 		"creator_id": &c.CreatorId,
 		"created_at": &c.CreatedAt,

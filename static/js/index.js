@@ -288,7 +288,7 @@
         }
         option = $.extend(true, {
             icon: 7,
-            btn: [{text: '&#x786E;&#x5B9A;', className: 'btn btn-sm btn-danger'}, '&#x53D6;&#x6D88;']
+            btn: ['确定', '取消']
         }, option);
         layer.confirm(msg, option, yes, cancel);
     };
@@ -360,12 +360,12 @@
     $.fn.tooltip && $('[data-toggle=tooltip]').tooltip();
 
     $('body').on('click', '.logout', function () {
-        layer.confirm("确认注销？", function () {
-            $.ajax({
+        layer.dangerConfirm("确认注销？", function () {
+            layer.ajax({
                 url: "/api/user/logout",
                 type: 'post',
                 data: {}
-            }).done(function (resp) {
+            }, {loadingText: "正在注销..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
                     layer.alert("注销失败！");

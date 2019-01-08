@@ -89,12 +89,11 @@
                 _this.showErrMsg('请输入密码！');
                 return;
             }
-
-            $.ajax({
+            layer.ajax({
                 url: _this.urlLogin,
                 type: 'post',
                 data: {email: email, password: pwd}
-            }).done(function (resp) {
+            }, {loadingText: "正在登录..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
                     _this.showErrMsg(resp.msg);

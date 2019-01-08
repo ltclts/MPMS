@@ -21,8 +21,15 @@ type model struct {
 	UpdatedAt string
 }
 
-const UNDELETED = 0
-const DELETED = 1
+const (
+	//表名定义
+	ConfigTableName = "config"
+	UserTableName   = "user"
+
+	//删除标志
+	UnDeleted = 0
+	Deleted   = 1
+)
 
 var db *sql.DB
 var tx *sql.Tx        //事务使用
