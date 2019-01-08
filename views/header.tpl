@@ -1,8 +1,9 @@
-login<header id="global_header" class="bg-primary">
+<header id="global_header" class="bg-primary">
     <div class="navbar navbar-inverse navbar-fixed-top" id="navbar" role="banner" style="">
         <div>
             <div class="navbar-header">
-                <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".zui-navbar-collapse">
+                <button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+                        data-target=".zui-navbar-collapse">
                     <span class="sr-only">切换导航</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -13,7 +14,7 @@ login<header id="global_header" class="bg-primary">
                             <i class="path-1"></i>
                             <i class="path-2"></i>
                         </span>
-                    <span class="brand-title">SHEIN</span>
+                    <span class="brand-title">{{.CompanyName}}</span>
                 </a>
             </div>
             <nav class="collapse navbar-collapse zui-navbar-collapse">
@@ -22,7 +23,7 @@ login<header id="global_header" class="bg-primary">
                         <a href="javascript:void(0);" style="padding:0;">
                             <span id="navMyInfo" style="display: block;padding:10px;">
                                 <i class="icon icon-user"></i>
-                                <span>cyu</span>
+                                <span>{{.LoginUserName}}</span>
                             </span>
                         </a>
                     </li>

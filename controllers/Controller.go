@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"MPMS/routers/uris"
+	"MPMS/session"
 	"fmt"
 	"github.com/astaxie/beego"
 )
@@ -34,6 +35,8 @@ func (b *Controller) RenderHtml(title string, pageName string, tplName string, h
 	b.Data["CurrentPageName"] = pageName
 	b.Data["xsrfdata"] = b.XSRFToken()
 	b.Data["ApiUriLogout"] = uris.ApiUriLogout
+	b.Data["CompanyName"] = "两分钱"
+	b.Data["LoginUserName"] = b.GetSession(session.UserName)
 	b.getMenuList()
 	b.Layout = "layout.tpl"
 	b.LayoutSections = map[string]string{"HtmlCss": htmlCssName, "Scripts": scriptsName, "Sidebar": sidebarName}
