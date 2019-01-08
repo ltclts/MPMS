@@ -14,7 +14,7 @@ type Flow struct {
 	ReferType uint8
 	Status    uint8
 	Content   string
-	model
+	Model
 }
 
 /**

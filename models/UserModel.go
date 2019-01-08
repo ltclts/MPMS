@@ -17,7 +17,7 @@ type User struct {
 	Type     uint8
 	Status   uint8
 	Sort     int
-	model
+	Model
 }
 
 const (

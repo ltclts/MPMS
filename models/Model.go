@@ -14,7 +14,7 @@ import (
 基础模型 用于写通用方法
 @author cyu 2018-4-28 16:29:54
 */
-type model struct {
+type Model struct {
 	IsDeleted uint8
 	CreatorId uint
 	CreatedAt string
@@ -40,7 +40,7 @@ var userTrans = false //是否开启事务
 /**
 连接数据库（使用单例模式）
 */
-func (b *model) InitDB() (*sql.DB, error) {
+func (b *Model) InitDB() (*sql.DB, error) {
 	var err error
 	if db != nil {
 		return db, err
@@ -56,7 +56,7 @@ func (b *model) InitDB() (*sql.DB, error) {
 /**
 开启事务
 */
-func (b *model) StartTrans() (*sql.Tx, error) {
+func (b *Model) StartTrans() (*sql.Tx, error) {
 	var err error
 	if db == nil {
 		db, err = b.InitDB()
@@ -74,7 +74,7 @@ func (b *model) StartTrans() (*sql.Tx, error) {
 /**
 事务回滚
 */
-func (b *model) Rollback() error {
+func (b *Model) Rollback() error {
 	err := tx.Rollback()
 	if err == nil {
 		userTrans = false
@@ -85,7 +85,7 @@ func (b *model) Rollback() error {
 /**
 事务回滚
 */
-func (b *model) Commit() error {
+func (b *Model) Commit() error {
 	err := tx.Commit()
 	if err == nil {
 		userTrans = false
@@ -96,7 +96,7 @@ func (b *model) Commit() error {
 /**
 查询方法
 */
-func (b *model) Query(sql string, args ...interface{}) (*sql.Rows, error) {
+func (b *Model) Query(sql string, args ...interface{}) (*sql.Rows, error) {
 	if db == nil {
 		if _, err := b.InitDB(); err != nil {
 			return nil, err
@@ -114,7 +114,7 @@ func (b *model) Query(sql string, args ...interface{}) (*sql.Rows, error) {
 /**
 执行方法
 */
-func (b *model) Exec(sql string, args ...interface{}) (sql.Result, error) {
+func (b *Model) Exec(sql string, args ...interface{}) (sql.Result, error) {
 
 	if db == nil {
 		if _, err := b.InitDB(); err != nil {
@@ -130,7 +130,7 @@ func (b *model) Exec(sql string, args ...interface{}) (sql.Result, error) {
 	return db.Exec(sql, args...)
 }
 
-func (b *model) renderFields(fields []string, getFieldsMap func() structure.Map) (string, structure.Array, error) {
+func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map) (string, structure.Array, error) {
 
 	var fieldsToReturn []string
 	var addrToReturn structure.Array
@@ -154,7 +154,7 @@ func (b *model) renderFields(fields []string, getFieldsMap func() structure.Map)
 	return strings.Join(fieldsToReturn, ","), addrToReturn, nil
 }
 
-func (b *model) renderWhere(where structure.Map) (string, structure.Array) {
+func (b *Model) renderWhere(where structure.Map) (string, structure.Array) {
 	var whereIndex []string
 	var whereValue structure.Array
 	whereIndex = append(whereIndex, " 1=1 ")
@@ -164,11 +164,11 @@ func (b *model) renderWhere(where structure.Map) (string, structure.Array) {
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
-func (b *model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
+func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
 	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
 }
 
-func (b *model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
+func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
 	whereStr, whereValue := b.renderWhere(where)
 	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
 	if err != nil {
@@ -178,7 +178,7 @@ func (b *model) QuickQueryWithExtra(fields []string, getFieldsMap func() structu
 	return rows, fieldsAddr, nil
 }
 
-func (b *model) InsertExec(fieldToValueMap structure.Map, table string) (uint, error) {
+func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (uint, error) {
 
 	//加入默认值
 	extraFields := structure.Map{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}

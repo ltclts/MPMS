@@ -12,7 +12,7 @@ type Config struct {
 	Type    uint8
 	Content string
 	Desc    string
-	model
+	Model
 }
 
 /**

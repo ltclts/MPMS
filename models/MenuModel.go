@@ -15,7 +15,7 @@ type Menu struct {
 	NameEn   string
 	Uri      string
 	Sort     uint
-	model
+	Model
 }
 
 const (
