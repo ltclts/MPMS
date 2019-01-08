@@ -79,6 +79,8 @@ func (b *Controller) getMenuList() {
 			if route.PageName == currentPageName {
 				menu[m].Routes[n].Active = true
 				menu[m].Active = true
+				b.Data["MenuFirstName"] = menu[m].Name
+				b.Data["MenuSecondName"] = menu[m].Routes[n].Name
 				goto end
 			}
 		}

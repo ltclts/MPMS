@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en_US">
 <head>
-    <link rel="bookmark" type="image/x-icon" href="/static/img/logo.icon"/>
-    <link rel="shortcut icon" href="/static/img/logo.icon">
+    <link rel="bookmark" type="image/x-icon" href="/static/img/logo.ico"/>
+    <link rel="shortcut icon" href="/static/img/logo.ico">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge">
