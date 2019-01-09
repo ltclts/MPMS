@@ -173,6 +173,32 @@ func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (int64, 
 	return result.LastInsertId()
 }
 
+func (b *Model) UpdateExec(fieldToValueMap structure.Map, where structure.Map, table string) (int64, error) {
+	//加入默认值
+	extraFields := structure.Map{"updated_at": helper.Now()}
+	for field, val := range extraFields {
+		if fieldToValueMap[field] == nil {
+			fieldToValueMap[field] = val
+		}
+	}
+
+	var fields []string
+	var values structure.Array
+	for field, value := range fieldToValueMap {
+		fields = append(fields, fmt.Sprintf("`%s`= ?", field))
+		values = append(values, value)
+	}
+
+	whereStr, whereValueArr := b.renderWhere(where)
+	values = append(values, whereValueArr...)
+	result, err := b.Exec(fmt.Sprintf("UPDATE `%s` SET %s WHERE %s", table, strings.Join(fields, ","), whereStr), values...)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected()
+}
+
 func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map) (string, structure.Array, error) {
 
 	var fieldsToReturn []string
@@ -190,7 +216,7 @@ func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map)
 			return "", nil, helper.ThrowNewError("invalid key " + field)
 		}
 
-		fieldsToReturn = append(fieldsToReturn, "`"+field+"`")
+		fieldsToReturn = append(fieldsToReturn, fmt.Sprintf("`%s`", field))
 		addrToReturn = append(addrToReturn, addr)
 	}
 
