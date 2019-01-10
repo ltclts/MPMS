@@ -18,7 +18,7 @@ func FilterUser(ctx *context.Context) {
 	can := func(uri string) bool {
 		fmt.Println(uri)
 		//特殊路由 可以不需要登录
-		exceptUris := []string{uris.HtmlUriLogin, uris.ApiUriLogin}
+		exceptUris := uris.GetUnCheckLoginUris()
 		for _, exceptUri := range exceptUris {
 			if uri == exceptUri || strings.Contains(uri, exceptUri+"?") {
 				return true

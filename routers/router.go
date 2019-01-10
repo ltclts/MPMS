@@ -31,6 +31,8 @@ func init() {
 	Routes = append(Routes, Route{uris.ApiUriLogin, &api.UserApiController{}, "post:Login"})
 	Routes = append(Routes, Route{uris.ApiUriLogout, &api.UserApiController{}, "post:Logout"})
 
+	Routes = append(Routes, Route{uris.ApiUriMpOutPageConfigRequest, &api.MPOutApiController{}, "post:PageConfigRequest"})
+
 	for _, route := range Routes {
 		beego.Router(route.Uri, route.ControllerInterface, route.Method)
 	}
