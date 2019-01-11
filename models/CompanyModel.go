@@ -50,7 +50,9 @@ func (c *Company) Select(fields []string, where structure.StringToObjectMap) ([]
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var companies []Company
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

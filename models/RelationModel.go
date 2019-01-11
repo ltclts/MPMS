@@ -23,7 +23,9 @@ func (r *Relation) Select(fields []string, where structure.StringToObjectMap) ([
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var relations []Relation
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

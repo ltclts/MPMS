@@ -25,7 +25,9 @@ func (f *Flow) Select(fields []string, where structure.StringToObjectMap) ([]Flo
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var flows []Flow
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

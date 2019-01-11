@@ -70,7 +70,9 @@ func (u *User) Select(fields []string, where structure.StringToObjectMap) ([]Use
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var users []User
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

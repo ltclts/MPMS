@@ -71,7 +71,9 @@ func (mp *MiniProgram) Select(fields []string, where structure.StringToObjectMap
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var miniPrograms []MiniProgram
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

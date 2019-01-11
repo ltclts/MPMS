@@ -31,7 +31,9 @@ func (m *Menu) Select(fields []string, where structure.StringToObjectMap) ([]Men
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	var menus []Menu
 	for rows.Next() {
 		err = rows.Scan(fieldsAddr...)

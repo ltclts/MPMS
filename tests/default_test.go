@@ -1,10 +1,7 @@
 package test
 
 import (
-	"MPMS/models"
 	_ "MPMS/routers"
-	"MPMS/structure"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -40,8 +37,5 @@ func TestBeego(t *testing.T) {
 }
 
 func TestHelper(t *testing.T) {
-	user := models.User{}
-	fmt.Println(user)
-	user.Update(structure.StringToObjectMap{"email": "", "status": 1}, structure.StringToObjectMap{"id": 2, "status": 0})
-	user.Insert(structure.StringToObjectMap{"email": "caoyu.work@foxmail.com", "phone": "13221733659", "status": 0})
+
 }
