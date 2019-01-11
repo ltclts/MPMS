@@ -17,7 +17,7 @@ type Relation struct {
 /**
 获取关系信息
 */
-func (r *Relation) Select(fields []string, where structure.Map) ([]Relation, error) {
+func (r *Relation) Select(fields []string, where structure.StringToObjectMap) ([]Relation, error) {
 	rows, fieldsAddr, err := r.QuickQuery(fields, r.getFieldsMap, where, RelationTableName)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (r *Relation) Select(fields []string, where structure.Map) ([]Relation, err
 }
 
 func (r *Relation) Insert(referType uint8, referId int64, referIdOthers int64, creatorId int64) (int64, error) {
-	return r.InsertExec(structure.Map{
+	return r.InsertExec(structure.StringToObjectMap{
 		"refer_type":      referType,
 		"refer_id":        referId,
 		"refer_id_others": referIdOthers,
@@ -48,8 +48,8 @@ func (r *Relation) Insert(referType uint8, referId int64, referIdOthers int64, c
 /**
 field与对应关系
 */
-func (r *Relation) getFieldsMap() structure.Map {
-	return structure.Map{
+func (r *Relation) getFieldsMap() structure.StringToObjectMap {
+	return structure.StringToObjectMap{
 		"id":              &r.Id,
 		"refer_id":        &r.ReferId,
 		"refer_id_others": &r.ReferIdOthers,

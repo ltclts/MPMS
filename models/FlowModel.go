@@ -19,7 +19,7 @@ type Flow struct {
 /**
 获取流水信息
 */
-func (f *Flow) Select(fields []string, where structure.Map) ([]Flow, error) {
+func (f *Flow) Select(fields []string, where structure.StringToObjectMap) ([]Flow, error) {
 	rows, fieldsAddr, err := f.QuickQuery(fields, f.getFieldsMap, where, FlowTableName)
 	if err != nil {
 		return nil, err
@@ -38,13 +38,13 @@ func (f *Flow) Select(fields []string, where structure.Map) ([]Flow, error) {
 	return flows, err
 }
 
-func (f *Flow) Insert(referId int64, referType uint8, status uint8, creatorId int64, contentMap structure.Map) (int64, error) {
+func (f *Flow) Insert(referId int64, referType uint8, status uint8, creatorId int64, contentMap structure.StringToObjectMap) (int64, error) {
 	content, err := json.Marshal(contentMap)
 	if err != nil {
 		return 0, nil
 	}
 
-	return f.InsertExec(structure.Map{
+	return f.InsertExec(structure.StringToObjectMap{
 		"refer_id":   referId,
 		"refer_type": referType,
 		"status":     status,
@@ -56,8 +56,8 @@ func (f *Flow) Insert(referId int64, referType uint8, status uint8, creatorId in
 /**
 field与对应关系
 */
-func (f *Flow) getFieldsMap() structure.Map {
-	return structure.Map{
+func (f *Flow) getFieldsMap() structure.StringToObjectMap {
+	return structure.StringToObjectMap{
 		"id":         &f.Id,
 		"refer_id":   &f.ReferId,
 		"refer_type": &f.ReferType,

@@ -17,7 +17,7 @@ type Config struct {
 /**
 获取配置信息
 */
-func (c *Config) Select(fields []string, where structure.Map) ([]Config, error) {
+func (c *Config) Select(fields []string, where structure.StringToObjectMap) ([]Config, error) {
 	rows, fieldsAddr, err := c.QuickQuery(fields, c.getFieldsMap, where, ConfigTableName)
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (c *Config) Select(fields []string, where structure.Map) ([]Config, error) 
 /**
 field与对应关系
 */
-func (c *Config) getFieldsMap() structure.Map {
-	return structure.Map{
+func (c *Config) getFieldsMap() structure.StringToObjectMap {
+	return structure.StringToObjectMap{
 		"id":         &c.Id,
 		"type":       &c.Type,
 		"content":    &c.Content,

@@ -3,6 +3,7 @@ package models
 import (
 	"MPMS/helper"
 	"MPMS/structure"
+	"fmt"
 )
 
 /**
@@ -33,12 +34,23 @@ const (
 /**
 获取用户状态与名称的映射关系
 */
-func (u *User) GetUserStatusToNameMap() map[uint8]string {
-	return map[uint8]string{
+func UserStatusToNameMap() structure.Uint8ToStringMap {
+	return structure.Uint8ToStringMap{
 		UserStatusInitial:   "未激活",
 		UserStatusInUse:     "已激活",
 		UserStatusForbidden: "已禁用",
 	}
+}
+
+func GetUserStatusNameByStatus(status uint8) (string, error) {
+	if name := UserStatusToNameMap()[status]; name != "" {
+		return name, nil
+	}
+	return "", helper.CreateNewError(fmt.Sprintf("invalid user status : %d", status))
+}
+
+func (u *User) GetStatusName() (string, error) {
+	return GetUserStatusNameByStatus(u.Status)
 }
 
 /**
@@ -52,7 +64,7 @@ func (u *User) CheckPwd(pwd string) bool {
 /**
 获取用户信息
 */
-func (u *User) Select(fields []string, where structure.Map) ([]User, error) {
+func (u *User) Select(fields []string, where structure.StringToObjectMap) ([]User, error) {
 	rows, fieldsAddr, err := u.QuickQuery(fields, u.getFieldsMap, where, UserTableName)
 	if err != nil {
 		return nil, err
@@ -74,8 +86,8 @@ func (u *User) Select(fields []string, where structure.Map) ([]User, error) {
 /**
 field与对应关系
 */
-func (u *User) getFieldsMap() structure.Map {
-	return structure.Map{
+func (u *User) getFieldsMap() structure.StringToObjectMap {
+	return structure.StringToObjectMap{
 		"id":         &u.Id,
 		"name":       &u.Name,
 		"email":      &u.Email,

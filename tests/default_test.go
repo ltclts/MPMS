@@ -42,6 +42,6 @@ func TestBeego(t *testing.T) {
 func TestHelper(t *testing.T) {
 	user := models.User{}
 	fmt.Println(user)
-	users, err := user.Select([]string{}, structure.Map{})
+	users, err := user.Select([]string{}, structure.StringToObjectMap{})
 	fmt.Println(users, err)
 }

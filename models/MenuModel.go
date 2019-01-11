@@ -18,14 +18,14 @@ type Menu struct {
 }
 
 const (
-	MenuTypeFirst  = 1
-	MenuTypeSecond = 2
+	MenuTypeFirst  = 1 //一级菜单
+	MenuTypeSecond = 2 //二级菜单
 )
 
 /**
 获取菜单信息
 */
-func (m *Menu) Select(fields []string, where structure.Map) ([]Menu, error) {
+func (m *Menu) Select(fields []string, where structure.StringToObjectMap) ([]Menu, error) {
 	rows, fieldsAddr, err := m.QuickQueryWithExtra(fields, m.getFieldsMap, where, MenuTableName, "order by sort")
 	if err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func (m *Menu) Select(fields []string, where structure.Map) ([]Menu, error) {
 /**
 field与对应关系
 */
-func (m *Menu) getFieldsMap() structure.Map {
-	return structure.Map{
+func (m *Menu) getFieldsMap() structure.StringToObjectMap {
+	return structure.StringToObjectMap{
 		"id":         &m.Id,
 		"parent_id":  &m.ParentId,
 		"type":       &m.Type,

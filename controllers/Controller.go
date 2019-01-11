@@ -55,9 +55,9 @@ func (b *Controller) getMenuList() {
 
 	m := models.Menu{}
 	active := false
-	if menuList, e := m.Select([]string{}, structure.Map{"is_deleted": models.UnDeleted, "type": models.MenuTypeFirst}); e == nil {
+	if menuList, e := m.Select([]string{}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "type": models.MenuTypeFirst}); e == nil {
 		for _, menuItem := range menuList {
-			if menuItemList, e := m.Select([]string{"name", "name_en", "uri"}, structure.Map{"is_deleted": models.UnDeleted, "type": models.MenuTypeSecond, "parent_id": menuItem.Id}); e == nil {
+			if menuItemList, e := m.Select([]string{"name", "name_en", "uri"}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "type": models.MenuTypeSecond, "parent_id": menuItem.Id}); e == nil {
 				routes = []route{}
 				active = false
 				for _, routeItem := range menuItemList {

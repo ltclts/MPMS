@@ -29,6 +29,7 @@ const (
 	MenuTableName     = "menu"
 	FlowTableName     = "flow"
 	RelationTableName = "relation"
+	CompanyTableName  = "company"
 
 	//删除标志
 	UnDeleted = 0
@@ -132,11 +133,11 @@ func (b *Model) Exec(sql string, args ...interface{}) (sql.Result, error) {
 	return db.Exec(sql, args...)
 }
 
-func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string) (*sql.Rows, structure.Array, error) {
+func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string) (*sql.Rows, structure.Array, error) {
 	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
 }
 
-func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.Map, where structure.Map, table string, extra string) (*sql.Rows, structure.Array, error) {
+func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string, extra string) (*sql.Rows, structure.Array, error) {
 	whereStr, whereValue := b.renderWhere(where)
 	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
 	if err != nil {
@@ -146,10 +147,10 @@ func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structu
 	return rows, fieldsAddr, nil
 }
 
-func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (int64, error) {
+func (b *Model) InsertExec(fieldToValueMap structure.StringToObjectMap, table string) (int64, error) {
 
 	//加入默认值
-	extraFields := structure.Map{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
+	extraFields := structure.StringToObjectMap{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
 	for field, val := range extraFields {
 		if fieldToValueMap[field] == nil {
 			fieldToValueMap[field] = val
@@ -173,9 +174,9 @@ func (b *Model) InsertExec(fieldToValueMap structure.Map, table string) (int64, 
 	return result.LastInsertId()
 }
 
-func (b *Model) UpdateExec(fieldToValueMap structure.Map, where structure.Map, table string) (int64, error) {
+func (b *Model) UpdateExec(fieldToValueMap structure.StringToObjectMap, where structure.StringToObjectMap, table string) (int64, error) {
 	//加入默认值
-	extraFields := structure.Map{"updated_at": helper.Now()}
+	extraFields := structure.StringToObjectMap{"updated_at": helper.Now()}
 	for field, val := range extraFields {
 		if fieldToValueMap[field] == nil {
 			fieldToValueMap[field] = val
@@ -199,7 +200,7 @@ func (b *Model) UpdateExec(fieldToValueMap structure.Map, where structure.Map, t
 	return result.RowsAffected()
 }
 
-func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map) (string, structure.Array, error) {
+func (b *Model) renderFields(fields []string, getFieldsMap func() structure.StringToObjectMap) (string, structure.Array, error) {
 
 	var fieldsToReturn []string
 	var addrToReturn structure.Array
@@ -213,7 +214,7 @@ func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map)
 	for _, field := range fields {
 		addr := fieldsMap[field]
 		if addr == nil {
-			return "", nil, helper.ThrowNewError("invalid key " + field)
+			return "", nil, helper.CreateNewError("invalid key " + field)
 		}
 
 		fieldsToReturn = append(fieldsToReturn, fmt.Sprintf("`%s`", field))
@@ -223,7 +224,7 @@ func (b *Model) renderFields(fields []string, getFieldsMap func() structure.Map)
 	return strings.Join(fieldsToReturn, ","), addrToReturn, nil
 }
 
-func (b *Model) renderWhere(where structure.Map) (string, structure.Array) {
+func (b *Model) renderWhere(where structure.StringToObjectMap) (string, structure.Array) {
 	var whereIndex []string
 	var whereValue structure.Array
 	whereIndex = append(whereIndex, " 1=1 ")

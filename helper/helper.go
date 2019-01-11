@@ -38,6 +38,6 @@ func Md5(str string) string {
 	return hex.EncodeToString(md5Ctx.Sum(nil))
 }
 
-func ThrowNewError(msg string) error {
+func CreateNewError(msg string) error {
 	return errors.New(msg)
 }
