@@ -20,7 +20,7 @@ type Flow struct {
 获取流水信息
 */
 func (f *Flow) Select(fields []string, where structure.StringToObjectMap) ([]Flow, error) {
-	rows, fieldsAddr, err := f.QuickQuery(fields, f.getFieldsMap, where, FlowTableName)
+	rows, fieldsAddr, err := f.quickQuery(fields, f.getFieldsMap, where, FlowTableName)
 	if err != nil {
 		return nil, err
 	}
@@ -41,16 +41,16 @@ func (f *Flow) Select(fields []string, where structure.StringToObjectMap) ([]Flo
 func (f *Flow) Insert(referId int64, referType uint8, status uint8, creatorId int64, contentMap structure.StringToObjectMap) (int64, error) {
 	content, err := json.Marshal(contentMap)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
-	return f.InsertExec(structure.StringToObjectMap{
+	return f.insertExec(structure.StringToObjectMap{
 		"refer_id":   referId,
 		"refer_type": referType,
 		"status":     status,
 		"creator_id": creatorId,
 		"content":    content,
-	}, FlowTableName)
+	}, f.getFieldsMap, FlowTableName)
 }
 
 /**

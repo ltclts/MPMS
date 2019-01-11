@@ -26,7 +26,7 @@ const (
 获取菜单信息
 */
 func (m *Menu) Select(fields []string, where structure.StringToObjectMap) ([]Menu, error) {
-	rows, fieldsAddr, err := m.QuickQueryWithExtra(fields, m.getFieldsMap, where, MenuTableName, "order by sort")
+	rows, fieldsAddr, err := m.quickQueryWithExtra(fields, m.getFieldsMap, where, MenuTableName, "order by sort")
 	if err != nil {
 		return nil, err
 	}

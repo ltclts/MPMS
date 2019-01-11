@@ -18,7 +18,7 @@ type Config struct {
 获取配置信息
 */
 func (c *Config) Select(fields []string, where structure.StringToObjectMap) ([]Config, error) {
-	rows, fieldsAddr, err := c.QuickQuery(fields, c.getFieldsMap, where, ConfigTableName)
+	rows, fieldsAddr, err := c.quickQuery(fields, c.getFieldsMap, where, ConfigTableName)
 	if err != nil {
 		return nil, err
 	}

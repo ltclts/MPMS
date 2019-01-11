@@ -3,6 +3,7 @@ package models
 import (
 	"MPMS/helper"
 	"MPMS/structure"
+	"encoding/json"
 	"fmt"
 )
 
@@ -65,7 +66,7 @@ func (mp *MiniProgram) GetStatusName() (string, error) {
 }
 
 func (mp *MiniProgram) Select(fields []string, where structure.StringToObjectMap) ([]MiniProgram, error) {
-	rows, fieldsAddr, err := mp.QuickQuery(fields, mp.getFieldsMap, where, MiniProgramTableName)
+	rows, fieldsAddr, err := mp.quickQuery(fields, mp.getFieldsMap, where, MiniProgramTableName)
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +82,28 @@ func (mp *MiniProgram) Select(fields []string, where structure.StringToObjectMap
 	}
 
 	return miniPrograms, err
+}
+
+func (mp *MiniProgram) Insert(insMap structure.StringToObjectMap) (int64, error) {
+	if content := insMap["content"]; content != nil {
+		content, err := json.Marshal(content)
+		if err != nil {
+			return 0, err
+		}
+		insMap["content"] = content
+	}
+	return mp.insertExec(insMap, mp.getFieldsMap, MiniProgramTableName)
+}
+
+func (mp *MiniProgram) Update(toUpdate structure.StringToObjectMap, where structure.StringToObjectMap) (int64, error) {
+	if content := toUpdate["content"]; content != nil {
+		content, err := json.Marshal(content)
+		if err != nil {
+			return 0, err
+		}
+		toUpdate["content"] = content
+	}
+	return mp.updateExec(toUpdate, where, mp.getFieldsMap, MiniProgramTableName)
 }
 
 /**

@@ -45,7 +45,7 @@ func (c *Company) GetStatusName() (string, error) {
 获取公司信息
 */
 func (c *Company) Select(fields []string, where structure.StringToObjectMap) ([]Company, error) {
-	rows, fieldsAddr, err := c.QuickQuery(fields, c.getFieldsMap, where, CompanyTableName)
+	rows, fieldsAddr, err := c.quickQuery(fields, c.getFieldsMap, where, CompanyTableName)
 	if err != nil {
 		return nil, err
 	}

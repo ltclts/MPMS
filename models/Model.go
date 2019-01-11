@@ -44,7 +44,7 @@ var userTrans = false //是否开启事务
 /**
 连接数据库（使用单例模式）
 */
-func (b *Model) InitDB() (*sql.DB, error) {
+func (b *Model) initDB() (*sql.DB, error) {
 	var err error
 	if db != nil {
 		return db, err
@@ -63,7 +63,7 @@ func (b *Model) InitDB() (*sql.DB, error) {
 func (b *Model) StartTrans() (*sql.Tx, error) {
 	var err error
 	if db == nil {
-		db, err = b.InitDB()
+		db, err = b.initDB()
 		if err != nil {
 			return nil, err
 		}
@@ -100,9 +100,9 @@ func (b *Model) Commit() error {
 /**
 查询方法
 */
-func (b *Model) Query(sql string, args ...interface{}) (*sql.Rows, error) {
+func (b *Model) query(sql string, args ...interface{}) (*sql.Rows, error) {
 	if db == nil {
-		if _, err := b.InitDB(); err != nil {
+		if _, err := b.initDB(); err != nil {
 			return nil, err
 		}
 	}
@@ -118,10 +118,10 @@ func (b *Model) Query(sql string, args ...interface{}) (*sql.Rows, error) {
 /**
 执行方法
 */
-func (b *Model) Exec(sql string, args ...interface{}) (sql.Result, error) {
+func (b *Model) exec(sql string, args ...interface{}) (sql.Result, error) {
 
 	if db == nil {
-		if _, err := b.InitDB(); err != nil {
+		if _, err := b.initDB(); err != nil {
 			return nil, err
 		}
 	}
@@ -134,21 +134,21 @@ func (b *Model) Exec(sql string, args ...interface{}) (sql.Result, error) {
 	return db.Exec(sql, args...)
 }
 
-func (b *Model) QuickQuery(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string) (*sql.Rows, structure.Array, error) {
-	return b.QuickQueryWithExtra(fields, getFieldsMap, where, table, "")
+func (b *Model) quickQuery(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string) (*sql.Rows, structure.Array, error) {
+	return b.quickQueryWithExtra(fields, getFieldsMap, where, table, "")
 }
 
-func (b *Model) QuickQueryWithExtra(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string, extra string) (*sql.Rows, structure.Array, error) {
+func (b *Model) quickQueryWithExtra(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string, extra string) (*sql.Rows, structure.Array, error) {
 	whereStr, whereValue := b.renderWhere(where)
 	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
 	if err != nil {
 		return nil, nil, err
 	}
-	rows, err := b.Query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
+	rows, err := b.query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
 	return rows, fieldsAddr, nil
 }
 
-func (b *Model) InsertExec(fieldToValueMap structure.StringToObjectMap, table string) (int64, error) {
+func (b *Model) insertExec(fieldToValueMap structure.StringToObjectMap, getFieldsMap func() structure.StringToObjectMap, table string) (int64, error) {
 
 	//加入默认值
 	extraFields := structure.StringToObjectMap{"is_deleted": UnDeleted, "created_at": helper.Now(), "updated_at": helper.Now()}
@@ -156,6 +156,14 @@ func (b *Model) InsertExec(fieldToValueMap structure.StringToObjectMap, table st
 		if fieldToValueMap[field] == nil {
 			fieldToValueMap[field] = val
 		}
+	}
+	//条件字段校验
+	var fieldsToCheck []string
+	for field := range fieldToValueMap {
+		fieldsToCheck = append(fieldsToCheck, field)
+	}
+	if err := b.checkFieldValid(fieldsToCheck, getFieldsMap); err != nil {
+		return 0, err
 	}
 
 	var fields []string
@@ -167,7 +175,7 @@ func (b *Model) InsertExec(fieldToValueMap structure.StringToObjectMap, table st
 		values = append(values, value)
 	}
 
-	result, err := b.Exec(fmt.Sprintf("INSERT INTO `%s`(%s) VALUES (%s)", table, strings.Join(fields, ","), strings.Join(alternatives, ",")), values...)
+	result, err := b.exec(fmt.Sprintf("INSERT INTO `%s`(%s) VALUES (%s)", table, strings.Join(fields, ","), strings.Join(alternatives, ",")), values...)
 	if err != nil {
 		return 0, err
 	}
@@ -175,13 +183,34 @@ func (b *Model) InsertExec(fieldToValueMap structure.StringToObjectMap, table st
 	return result.LastInsertId()
 }
 
-func (b *Model) UpdateExec(fieldToValueMap structure.StringToObjectMap, where structure.StringToObjectMap, table string) (int64, error) {
+func (b *Model) checkFieldValid(fields []string, getFieldsMap func() structure.StringToObjectMap) error {
+	fieldsMap := getFieldsMap()
+	for _, field := range fields {
+		if addr := fieldsMap[field]; addr == nil {
+			return helper.CreateNewError(fmt.Sprintf("invalid key:%s", field))
+		}
+	}
+	return nil
+}
+
+func (b *Model) updateExec(fieldToValueMap structure.StringToObjectMap, where structure.StringToObjectMap, getFieldsMap func() structure.StringToObjectMap, table string) (int64, error) {
 	//加入默认值
 	extraFields := structure.StringToObjectMap{"updated_at": helper.Now()}
 	for field, val := range extraFields {
 		if fieldToValueMap[field] == nil {
 			fieldToValueMap[field] = val
 		}
+	}
+
+	//条件字段校验
+	var fieldsToCheck []string
+	for _, object := range []structure.StringToObjectMap{fieldToValueMap, where} {
+		for field := range object {
+			fieldsToCheck = append(fieldsToCheck, field)
+		}
+	}
+	if err := b.checkFieldValid(fieldsToCheck, getFieldsMap); err != nil {
+		return 0, err
 	}
 
 	var fields []string
@@ -193,7 +222,7 @@ func (b *Model) UpdateExec(fieldToValueMap structure.StringToObjectMap, where st
 
 	whereStr, whereValueArr := b.renderWhere(where)
 	values = append(values, whereValueArr...)
-	result, err := b.Exec(fmt.Sprintf("UPDATE `%s` SET %s WHERE %s", table, strings.Join(fields, ","), whereStr), values...)
+	result, err := b.exec(fmt.Sprintf("UPDATE `%s` SET %s WHERE %s", table, strings.Join(fields, ","), whereStr), values...)
 	if err != nil {
 		return 0, err
 	}

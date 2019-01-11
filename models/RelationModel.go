@@ -18,7 +18,7 @@ type Relation struct {
 获取关系信息
 */
 func (r *Relation) Select(fields []string, where structure.StringToObjectMap) ([]Relation, error) {
-	rows, fieldsAddr, err := r.QuickQuery(fields, r.getFieldsMap, where, RelationTableName)
+	rows, fieldsAddr, err := r.quickQuery(fields, r.getFieldsMap, where, RelationTableName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +37,12 @@ func (r *Relation) Select(fields []string, where structure.StringToObjectMap) ([
 }
 
 func (r *Relation) Insert(referType uint8, referId int64, referIdOthers int64, creatorId int64) (int64, error) {
-	return r.InsertExec(structure.StringToObjectMap{
+	return r.insertExec(structure.StringToObjectMap{
 		"refer_type":      referType,
 		"refer_id":        referId,
 		"refer_id_others": referIdOthers,
 		"creator_id":      creatorId,
-	}, RelationTableName)
+	}, r.getFieldsMap, RelationTableName)
 }
 
 /**

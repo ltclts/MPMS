@@ -65,7 +65,7 @@ func (u *User) CheckPwd(pwd string) bool {
 获取用户信息
 */
 func (u *User) Select(fields []string, where structure.StringToObjectMap) ([]User, error) {
-	rows, fieldsAddr, err := u.QuickQuery(fields, u.getFieldsMap, where, UserTableName)
+	rows, fieldsAddr, err := u.quickQuery(fields, u.getFieldsMap, where, UserTableName)
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +81,14 @@ func (u *User) Select(fields []string, where structure.StringToObjectMap) ([]Use
 	}
 
 	return users, err
+}
+
+func (u *User) Insert(insMap structure.StringToObjectMap) (int64, error) {
+	return u.insertExec(insMap, u.getFieldsMap, UserTableName)
+}
+
+func (u *User) Update(toUpdate structure.StringToObjectMap, where structure.StringToObjectMap) (int64, error) {
+	return u.updateExec(toUpdate, where, u.getFieldsMap, UserTableName)
 }
 
 /**
