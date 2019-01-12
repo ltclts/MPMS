@@ -36,6 +36,7 @@ CREATE TABLE `menu` (
 `name_en` varchar(100) NOT NULL DEFAULT '' COMMENT '英文名',
 `uri` varchar(100) NOT NULL DEFAULT '' COMMENT '路由或者图标',
 `sort` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+`user_type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '用户类别 同user.type',
 `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
 `creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
@@ -75,6 +76,7 @@ KEY `ids_refer_id_others` (`refer_id_others`)
 CREATE TABLE `company` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
 `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名称',
+`short_name` varchar(50) NOT NULL DEFAULT '' COMMENT '简称',
 `remark` varchar(100) NOT NULL DEFAULT '' COMMENT '备注',
 `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0-初始状态 1-启用 2-禁用',
 `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
@@ -82,7 +84,8 @@ CREATE TABLE `company` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_name` (`name`)
+KEY `ids_name` (`name`),
+KEY `ids_short_name` (`short_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='公司表';
 
 CREATE TABLE `mini_program` (

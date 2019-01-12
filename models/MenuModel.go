@@ -10,6 +10,7 @@ Menu 模型
 type Menu struct {
 	ParentId int64
 	Type     uint8
+	UserType uint8
 	Name     string
 	NameEn   string
 	Uri      string
@@ -58,6 +59,7 @@ func (m *Menu) getFieldsMap() structure.StringToObjectMap {
 		"name_en":    &m.NameEn,
 		"uri":        &m.Uri,
 		"sort":       &m.Sort,
+		"user_type":  &m.UserType,
 		"is_deleted": &m.IsDeleted,
 		"creator_id": &m.CreatorId,
 		"created_at": &m.CreatedAt,

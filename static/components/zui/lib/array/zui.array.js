@@ -1,8 +1,8 @@
 /*!
- * ZUI: 数组辅助方法 - v1.7.0 - 2017-06-17
+ * ZUI: 数组辅助方法 - v1.8.1 - 2018-01-18
  * http://zui.sexy
  * GitHub: https://github.com/easysoft/zui.git 
- * Copyright (c) 2017 cnezsoft.com; Licensed MIT
+ * Copyright (c) 2018 cnezsoft.com; Licensed MIT
  */
 
 /* ========================================================================
@@ -164,7 +164,7 @@
      * @param  {array} result
      * @return {array}
      */
-    if(!Array.prototype.mawherep) {
+    if(!Array.prototype.where) {
         Array.prototype.where = function(conditions, result) {
             result = result || [];
             var cdt, ok, objVal;

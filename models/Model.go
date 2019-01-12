@@ -139,6 +139,16 @@ func (b *Model) quickQuery(fields []string, getFieldsMap func() structure.String
 }
 
 func (b *Model) quickQueryWithExtra(fields []string, getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string, extra string) (*sql.Rows, structure.Array, error) {
+
+	//条件字段校验
+	var fieldsToCheck []string
+	for field := range where {
+		fieldsToCheck = append(fieldsToCheck, field)
+	}
+	if err := b.checkFieldValid(append(fieldsToCheck, fields...), getFieldsMap); err != nil {
+		return nil, nil, err
+	}
+
 	whereStr, whereValue := b.renderWhere(where)
 	fieldsStr, fieldsAddr, err := b.renderFields(fields, getFieldsMap)
 	if err != nil {

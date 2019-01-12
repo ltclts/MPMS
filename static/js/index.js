@@ -295,6 +295,12 @@
 })();
 
 !(function (undefined/*页面初始化*/) {
+    let  $treeMenu = $('#treeMenu');
+    $treeMenu && $treeMenu.on('click', 'a', function() {
+        $('#treeMenu li.active').removeClass('active');
+        $(this).closest('li').addClass('active');
+    });
+
     $.fn.popover && $('[data-toggle=popover]').popover();
     $.fn.chosen && $('select.chosen-select').each(function (i, e) {
         let $this = $(e),

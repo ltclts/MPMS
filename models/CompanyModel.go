@@ -10,9 +10,10 @@ import (
 company 模型
 */
 type Company struct {
-	Name   string
-	Remark string
-	Status uint8
+	Name      string
+	ShortName string
+	Remark    string
+	Status    uint8
 	Model
 }
 
@@ -72,6 +73,7 @@ func (c *Company) getFieldsMap() structure.StringToObjectMap {
 	return structure.StringToObjectMap{
 		"id":         &c.Id,
 		"name":       &c.Name,
+		"short_name": &c.ShortName,
 		"remark":     &c.Remark,
 		"status":     &c.Status,
 		"is_deleted": &c.IsDeleted,

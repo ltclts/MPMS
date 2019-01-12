@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" href="/static/components/zui/css/zui.min.css">
-    <link rel="stylesheet" href="/static/components/zui/lib/datatable/zui.datatable.min.css">
+    <link rel="stylesheet" href="/static/components/zui/lib/datagrid/zui.datagrid.min.css">
     <link rel="stylesheet" href="/static/components/layui/css/layui.css">
     <link rel="stylesheet" href="/static/components/zui/lib/chosen/chosen.css">
     <link rel="stylesheet" href="/static/components/zui/lib/datetimepicker/datetimepicker.min.css">
@@ -38,7 +38,7 @@
 <script src="/static/components/vue/vue-2.5.16.min.js"></script>
 <script src="/static/components/zui/js/zui.min.js"></script>
 <script src="/static/components/layui/layui.all.js"></script>
-<script src="/static/components/zui/lib/datatable/zui.datatable.min.js"></script>
+<script src="/static/components/zui/lib/datagrid/zui.datagrid.min.js"></script>
 <script src="/static/components/zui/lib/chosen/chosen.min.js"></script>
 <script src="/static/components/zui/lib/datetimepicker/datetimepicker.min.js"></script>
 <script src="/static/components/zui/lib/uploader/zui.uploader.min.js"></script>

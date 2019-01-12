@@ -3,10 +3,13 @@ package uris
 const (
 	HtmlUriIndex = "/" //主页
 
-	HtmlUriLogin = "/html/user/login" //登陆页面
+	HtmlUriLogin        = "/html/user/login"    //登陆页面
+	HtmlUriCompanyIndex = "/html/company/index" //公司管理-账户管理
 
 	ApiUriLogin  = "/api/user/login"  //登陆接口
 	ApiUriLogout = "/api/user/logout" //登出接口
+
+	ApiUriCompanyList = "/api/company/list" //公司管理-账户管理-页面数据
 
 	ApiUriMpOutPageConfigRequest = "/api/mp/out/page_config_request"
 )

@@ -52,12 +52,22 @@ func (b *Controller) getMenuList() {
 	var menu []dashBoard
 	var routes []route
 	var currentPageName = b.Data["CurrentPageName"]
+	userType := b.GetSession(session.UserType)
 
 	m := models.Menu{}
 	active := false
-	if menuList, e := m.Select([]string{}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "type": models.MenuTypeFirst}); e == nil {
+	if menuList, e := m.Select([]string{}, structure.StringToObjectMap{
+		"is_deleted": models.UnDeleted,
+		"type":       models.MenuTypeFirst,
+		"user_type":  userType,
+	}); e == nil {
 		for _, menuItem := range menuList {
-			if menuItemList, e := m.Select([]string{"name", "name_en", "uri"}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "type": models.MenuTypeSecond, "parent_id": menuItem.Id}); e == nil {
+			if menuItemList, e := m.Select([]string{"name", "name_en", "uri"}, structure.StringToObjectMap{
+				"is_deleted": models.UnDeleted,
+				"type":       models.MenuTypeSecond,
+				"parent_id":  menuItem.Id,
+				"user_type":  userType,
+			}); e == nil {
 				routes = []route{}
 				active = false
 				for _, routeItem := range menuItemList {

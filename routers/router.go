@@ -33,6 +33,9 @@ func init() {
 
 	Routes = append(Routes, Route{uris.ApiUriMpOutPageConfigRequest, &api.MPOutApiController{}, "post:PageConfigRequest"})
 
+	Routes = append(Routes, Route{uris.HtmlUriCompanyIndex, &controllers.CompanyController{}, "get:Index"})
+	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
+
 	for _, route := range Routes {
 		beego.Router(route.Uri, route.ControllerInterface, route.Method)
 	}
