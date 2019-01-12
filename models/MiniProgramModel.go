@@ -86,6 +86,10 @@ func (mp *MiniProgram) Select(fields []string, where structure.StringToObjectMap
 	return miniPrograms, err
 }
 
+func (mp *MiniProgram) Count(where structure.StringToObjectMap) (int64, error) {
+	return mp.count(mp.getFieldsMap, where, MiniProgramTableName)
+}
+
 func (mp *MiniProgram) Insert(insMap structure.StringToObjectMap) (int64, error) {
 	if content := insMap["content"]; content != nil {
 		content, err := json.Marshal(content)

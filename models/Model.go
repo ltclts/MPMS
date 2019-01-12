@@ -158,6 +158,30 @@ func (b *Model) quickQueryWithExtra(fields []string, getFieldsMap func() structu
 	return rows, fieldsAddr, nil
 }
 
+func (b *Model) count(getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string) (int64, error) {
+	var count int64 = 0
+	//条件字段校验
+	var fieldsToCheck []string
+	for field := range where {
+		fieldsToCheck = append(fieldsToCheck, field)
+	}
+	if err := b.checkFieldValid(fieldsToCheck, getFieldsMap); err != nil {
+		return count, err
+	}
+	whereStr, whereValue := b.renderWhere(where)
+	rows, err := b.query(fmt.Sprintf("SELECT count(id) as count FROM `%s` WHERE %s", table, whereStr), whereValue...)
+	if err != nil {
+		return count, err
+	}
+
+	defer func() { _ = rows.Close() }()
+	for rows.Next() {
+		err = rows.Scan(&count)
+		return count, err
+	}
+	return count, nil
+}
+
 func (b *Model) insertExec(fieldToValueMap structure.StringToObjectMap, getFieldsMap func() structure.StringToObjectMap, table string) (int64, error) {
 
 	//加入默认值

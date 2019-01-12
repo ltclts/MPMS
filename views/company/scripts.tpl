@@ -3,6 +3,7 @@
     let company = {
         $datagrid: $('#datagrid'),
         urlGetList:{{.UrlGetList}},
+        listInfo: {},
         init: function () {
             this.render();
         },
@@ -40,14 +41,27 @@
                         {name: 'mp_count', label: '小程序数量'},
                         {name: 'status', label: '当前状态'},
                         {name: 'creator', label: '创建人'},
-                        {name: 'created_at', label: '创建时间'},
+                        {name: 'expire_at', label: '过期时间', width: 160},
                     ],
-                    array: [
-                        {name: '两分钱', company_contact_user: '曹禺', company_contact_user_phone: '13221733659', status: '已启用', mp_count:2,creator:'曹禺',created_at:'2019.12.20 10:59'}
-                    ]
+                    array: info.list
                 },
                 checkable: true,
-                sortable: true
+                sortable: true,
+                configs: function (selector) {
+                    let len = selector.length;
+                    if (len > 2 && selector.substr(0, 2) !== 'R0' && selector.substr(len - 2, len) === 'C4') {
+                        console.log(selector);
+                        return {
+                            html: true,
+                            className: 'text-center',
+                            style: {
+                                color: '#00b8d4',
+                                backgroundColor: '#e0f7fa'
+                            }
+                        }
+                    }
+
+                }
             });
         }
     };

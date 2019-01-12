@@ -14,6 +14,10 @@ type Relation struct {
 	Model
 }
 
+const (
+	RelationReferTypeCompanyContactUser = 1
+)
+
 /**
 获取关系信息
 */

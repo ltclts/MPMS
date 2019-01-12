@@ -13,6 +13,7 @@ type Company struct {
 	Name      string
 	ShortName string
 	Remark    string
+	ExpireAt  string
 	Status    uint8
 	Model
 }
@@ -76,6 +77,7 @@ func (c *Company) getFieldsMap() structure.StringToObjectMap {
 		"short_name": &c.ShortName,
 		"remark":     &c.Remark,
 		"status":     &c.Status,
+		"expire_at":  &c.ExpireAt,
 		"is_deleted": &c.IsDeleted,
 		"creator_id": &c.CreatorId,
 		"created_at": &c.CreatedAt,

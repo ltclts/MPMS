@@ -79,6 +79,7 @@ CREATE TABLE `company` (
 `short_name` varchar(50) NOT NULL DEFAULT '' COMMENT '简称',
 `remark` varchar(100) NOT NULL DEFAULT '' COMMENT '备注',
 `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0-初始状态 1-启用 2-禁用',
+`expire_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '过期时间',
 `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
 `creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
