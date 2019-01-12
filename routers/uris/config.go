@@ -4,7 +4,8 @@ const (
 	HtmlUriIndex = "/" //主页
 
 	HtmlUriLogin             = "/html/user/login"          //登陆页面
-	HtmlUriCompanyIndex      = "/html/company/index"       //公司管理-账户管理
+	HtmlUriCompany           = "/html/company"             //公司管理-账户管理
+	HtmlUriMiniProgram       = "/html/mini_program"        //小程序-管理
 	HtmlUriMiniProgramCreate = "/html/mini_program/create" //小程序-创建
 
 	ApiUriLogin  = "/api/user/login"  //登陆接口

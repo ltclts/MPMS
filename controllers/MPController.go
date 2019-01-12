@@ -19,5 +19,5 @@ func (mp *MPController) Create() {
 	mp.Data["CompanyId"] = param.CompanyId
 	mp.Data["OperateType"] = MPOperateTypeCreate //创建
 	mp.Data["MiniProgramTypeToNameMap"] = models.MiniProgramTypeToNameMap()
-	mp.RenderHtml("小程序创建", "mp_create", "mini_program/edit.tpl", "mini_program/css.tpl", "mini_program/scripts.tpl", "")
+	mp.RenderHtml("小程序创建", "mp", "mini_program/edit.tpl", "mini_program/css.tpl", "mini_program/scripts.tpl", "")
 }
