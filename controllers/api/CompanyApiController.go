@@ -23,14 +23,6 @@ func (u *CompanyApiController) List() {
 		return
 	}
 
-	//{name: 'name', label: '公司名称'},
-	//	{name: 'company_contact_user', label: '联系人'},
-	//		{name: 'company_contact_user_phone', label: '联系电话'},
-	//			{name: 'mp_count', label: '小程序数量'},
-	//				{name: 'status', label: '当前状态'},
-	//					{name: 'creator', label: '创建人'},
-	//						{name: 'created_at', label: '创建时间'},
-
 	var list []structure.StringToObjectMap
 	company := models.Company{}
 	user := models.User{}
@@ -47,7 +39,7 @@ func (u *CompanyApiController) List() {
 
 	for _, item := range companies {
 		statusName, _ := item.GetStatusName()
-		listItem := structure.StringToObjectMap{"name": item.ShortName, "status": statusName, "expire_at": item.ExpireAt}
+		listItem := structure.StringToObjectMap{"id": item.Id, "name": item.ShortName, "status": statusName, "expire_at": item.ExpireAt}
 		relations, err = relation.Select([]string{"refer_id_others"}, structure.StringToObjectMap{
 			"is_deleted": models.UnDeleted,
 			"refer_type": models.RelationReferTypeCompanyContactUser,

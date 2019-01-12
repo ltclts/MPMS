@@ -3,7 +3,11 @@
     let company = {
         $datagrid: $('#datagrid'),
         urlGetList:{{.UrlGetList}},
-        listInfo: {},
+        urlMiniProgramCreate:{{.HtmlUriMiniProgramCreate}},
+        checkedItem: {},
+        $inUse: $('.btn-in-use'),
+        $forbidden: $('.btn-forbidden'),
+        $mpCreate: $('.btn-mp-create'),
         init: function () {
             this.render();
         },
@@ -14,6 +18,26 @@
         handleEvent: function () {
             let _this = this;
 
+            $('body').on('click', '.datagrid-row', function () {
+                let selectItems = _this.$datagrid.data('zui.datagrid').getCheckItems();
+                if (selectItems.length === 1) {
+                    _this.checkedItem = selectItems[0];
+                    _this.$mpCreate.removeClass('disabled');
+                    _this.$inUse.removeClass('disabled');
+                    _this.$forbidden.removeClass('disabled');
+                } else {
+                    _this.checkedItem = {};
+                    !_this.$mpCreate.hasClass('disabled') && _this.$mpCreate.addClass('disabled');
+                    !_this.$inUse.hasClass('disabled') && _this.$inUse.addClass('disabled');
+                    !_this.$forbidden.hasClass('disabled') && _this.$forbidden.addClass('disabled');
+                }
+                console.log(selectItems);
+            }).on('click', '.btn-mp-create', function () {
+                if (!_this.checkedItem) {
+                    return;
+                }
+                location.href = _this.urlMiniProgramCreate + "?company_id=" + _this.checkedItem.id;
+            });
         },
         renderData() {
             let _this = this;

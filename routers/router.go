@@ -31,10 +31,14 @@ func init() {
 	Routes = append(Routes, Route{uris.ApiUriLogin, &api.UserApiController{}, "post:Login"})
 	Routes = append(Routes, Route{uris.ApiUriLogout, &api.UserApiController{}, "post:Logout"})
 
-	Routes = append(Routes, Route{uris.ApiUriMpOutPageConfigRequest, &api.MPOutApiController{}, "post:PageConfigRequest"})
-
 	Routes = append(Routes, Route{uris.HtmlUriCompanyIndex, &controllers.CompanyController{}, "get:Index"})
 	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
+	Routes = append(Routes, Route{uris.HtmlUriMiniProgramCreate, &controllers.MPController{}, "get:Create"})
+
+	/**
+	外部调用接口
+	*/
+	Routes = append(Routes, Route{uris.ApiUriMpOutPageConfigRequest, &api.MPOutApiController{}, "post:PageConfigRequest"})
 
 	for _, route := range Routes {
 		beego.Router(route.Uri, route.ControllerInterface, route.Method)
