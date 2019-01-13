@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"MPMS/helper"
 	"MPMS/models"
 	"MPMS/routers/uris"
 	"MPMS/session"
 	"MPMS/structure"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 )
@@ -16,13 +18,27 @@ type Controller struct {
 	beego.Controller
 }
 
+func (b *Controller) getSessionCompanyInfo() (company models.Company, err error) {
+	if b.GetSession(session.UserType).(uint8) == models.UserTypeCustomer {
+		companyInfoBytes := b.GetSession(session.CompanyInfo).([]byte)
+		_ = json.Unmarshal(companyInfoBytes, &company)
+		return company, nil
+	}
+	return company, helper.CreateNewError("该用户为管理员用户")
+}
+
 func (b *Controller) RenderHtml(title string, pageName string, tplName string, htmlCssName string, scriptsName string, sidebarName string) {
 	b.TplName = tplName
 	b.Data["Title"] = title
 	b.Data["CurrentPageName"] = pageName
 	b.Data["xsrfdata"] = b.XSRFToken()
 	b.Data["ApiUriLogout"] = uris.ApiUriLogout
-	b.Data["CompanyName"] = "两分钱"
+	company, err := b.getSessionCompanyInfo()
+	if err != nil {
+		b.Data["CompanyName"] = "两分钱"
+	} else {
+		b.Data["CompanyName"] = company.Name
+	}
 	b.Data["LoginUserName"] = b.GetSession(session.UserName)
 	b.getMenuList()
 	b.Layout = "layout.tpl"

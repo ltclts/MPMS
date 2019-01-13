@@ -2,6 +2,7 @@
 
     let mp = {
         operateType:{{.OperateType}},
+        companyId:{{.CompanyId}},
         init: function () {
             this.render();
         },

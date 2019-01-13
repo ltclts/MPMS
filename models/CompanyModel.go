@@ -43,6 +43,36 @@ func (c *Company) GetStatusName() (string, error) {
 	return GetCompanyStatusNameByStatus(c.Status)
 }
 
+func (c *Company) GetCompanyByContactUserId(userId int64) (company Company, err error) {
+	relation := Relation{}
+	relations, err := relation.Select([]string{"refer_id"}, structure.StringToObjectMap{
+		"is_deleted":      UnDeleted,
+		"refer_type":      RelationReferTypeCompanyContactUser,
+		"refer_id_others": userId,
+	})
+	if err != nil {
+		return company, err
+	}
+
+	if 1 != len(relations) {
+		return company, helper.CreateNewError(fmt.Sprintf("所在公司信息不唯一！user_id:%d", userId))
+	}
+
+	companies, err := company.Select([]string{"id", "name", "short_name", "creator_id", "expire_at"}, structure.StringToObjectMap{
+		"is_deleted": UnDeleted,
+		"id":         relations[0].ReferId,
+	})
+
+	if err != nil {
+		return company, err
+	}
+	if len(companies) >= 1 {
+		return companies[0], nil
+	} else {
+		return company, helper.CreateNewError("没有相关的公司信息！")
+	}
+}
+
 /**
 获取公司信息
 */

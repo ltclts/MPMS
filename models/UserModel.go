@@ -60,6 +60,32 @@ func (u *User) CheckPwd(pwd string) bool {
 	pwd = helper.Md5(pwd)
 	return pwd == u.Password
 }
+func (u *User) GetContactUserByCompanyId(companyId int64) (user User, err error) {
+	relation := Relation{}
+	relations, err := relation.Select([]string{"refer_id_others"}, structure.StringToObjectMap{
+		"is_deleted": UnDeleted,
+		"refer_type": RelationReferTypeCompanyContactUser,
+		"refer_id":   companyId,
+	})
+	if err != nil {
+		return user, err
+	}
+	if len(relations) == 1 {
+		//联系人
+		users, err := u.Select([]string{"name", "phone"}, structure.StringToObjectMap{
+			"is_deleted": UnDeleted,
+			"id":         relations[0].ReferIdOthers,
+		})
+		if err != nil {
+			return user, err
+		}
+		if len(users) != 1 {
+			return user, helper.CreateNewError("没有获取到联系人信息")
+		}
+		return users[0], nil
+	}
+	return user, helper.CreateNewError("没有获取到联系人信息或者联系人信息不唯一！")
+}
 
 /**
 获取用户信息
@@ -83,6 +109,29 @@ func (u *User) Select(fields []string, where structure.StringToObjectMap) ([]Use
 	}
 
 	return users, err
+}
+
+/**
+获取用户信息
+*/
+func (u *User) SelectOne(fields []string, where structure.StringToObjectMap) (user User, err error) {
+	rows, fieldsAddr, err := u.quickQueryWithExtra(fields, u.getFieldsMap, where, UserTableName, "limit 1")
+	if err != nil {
+		return user, err
+	}
+
+	defer func() {
+		_ = rows.Close()
+	}()
+	for rows.Next() {
+		err = rows.Scan(fieldsAddr...)
+		if err != nil {
+			return user, err
+		}
+		return *u, err
+	}
+
+	return user, err
 }
 
 func (u *User) Insert(insMap structure.StringToObjectMap) (int64, error) {

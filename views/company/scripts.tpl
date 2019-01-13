@@ -4,6 +4,7 @@
         $datagrid: $('#datagrid'),
         urlGetList:{{.UrlGetList}},
         urlMiniProgramCreate:{{.HtmlUriMiniProgramCreate}},
+        companyId:{{.CompanyId}},
         checkedItem: {},
         $inUse: $('.btn-in-use'),
         $forbidden: $('.btn-forbidden'),
@@ -36,7 +37,8 @@
                 if (!_this.checkedItem) {
                     return;
                 }
-                location.href = _this.urlMiniProgramCreate + "?company_id=" + _this.checkedItem.id;
+                //如果有companyId则是用户登陆 那么是管理员登陆
+                location.href = _this.urlMiniProgramCreate + (_this.companyId ? "" : ("?company_id=" + _this.checkedItem.id));
             });
         },
         renderData() {
@@ -44,7 +46,7 @@
             layer.ajax({
                 url: _this.urlGetList,
                 type: 'post',
-                data: {}
+                data: {id: _this.companyId ? _this.companyId : 0}
             }, {loadingText: "数据加载中..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {

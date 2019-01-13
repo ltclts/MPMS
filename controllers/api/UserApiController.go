@@ -5,6 +5,7 @@ import (
 	"MPMS/routers/uris"
 	"MPMS/session"
 	"MPMS/structure"
+	"encoding/json"
 	"fmt"
 )
 
@@ -12,21 +13,19 @@ type UserApiController struct {
 	Controller
 }
 
-type loginParas struct {
-	Email    string `form:"email"`
-	Password string `form:"password"`
-}
-
 func (u *UserApiController) Login() {
 	//表单方式提交
-	param := loginParas{}
-	if err := u.ParseForm(&param); err != nil {
+	loginReq := struct {
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	}{}
+	if err := u.ParseForm(&loginReq); err != nil {
 		u.ApiReturn(structure.Response{Error: 1, Msg: "用户名或密码不正确！", Info: structure.StringToObjectMap{}})
 		return
 	}
 
 	user := models.User{}
-	users, err := user.Select([]string{}, structure.StringToObjectMap{"email": param.Email, "is_deleted": models.UnDeleted})
+	users, err := user.Select([]string{}, structure.StringToObjectMap{"email": loginReq.Email, "is_deleted": models.UnDeleted})
 	if err != nil {
 		u.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
@@ -42,7 +41,7 @@ func (u *UserApiController) Login() {
 		return
 	}
 
-	if !user.CheckPwd(param.Password) {
+	if !user.CheckPwd(loginReq.Password) {
 		u.ApiReturn(structure.Response{Error: 5, Msg: "用户名或密码不正确！", Info: structure.StringToObjectMap{}})
 		return
 	}
@@ -57,6 +56,20 @@ func (u *UserApiController) Login() {
 		return
 	}
 
+	if user.Type == models.UserTypeCustomer {
+		company := models.Company{}
+		company, err = company.GetCompanyByContactUserId(user.Id)
+		if err != nil {
+			u.ApiReturn(structure.Response{Error: 7, Msg: fmt.Sprintf("获取公司信息失败：%s！", err.Error()), Info: structure.StringToObjectMap{}})
+			return
+		}
+		companyStr, err := json.Marshal(company)
+		if err != nil {
+			u.ApiReturn(structure.Response{Error: 8, Msg: fmt.Sprintf("获取公司信息失败：%s！", err.Error()), Info: structure.StringToObjectMap{}})
+			return
+		}
+		u.SetSession(session.CompanyInfo, companyStr)
+	}
 	u.SetSession(session.UUID, user.Id)
 	u.SetSession(session.UserName, user.Name)
 	u.SetSession(session.UserType, user.Type)
@@ -76,5 +89,6 @@ func (u *UserApiController) Logout() {
 	u.SetSession(session.UUID, nil)
 	u.SetSession(session.UserName, nil)
 	u.SetSession(session.UserType, nil)
+	u.SetSession(session.CompanyInfo, nil)
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"uri": uris.HtmlUriLogin}})
 }
