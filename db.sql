@@ -13,7 +13,7 @@ CREATE TABLE `user` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 CREATE TABLE `config` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -25,8 +25,8 @@ CREATE TABLE `config` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='配置表';
+KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置表';
 
 CREATE TABLE `menu` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -42,8 +42,8 @@ CREATE TABLE `menu` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_type_parent_id` (`type`,`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='菜单表';
+KEY `idx_type_parent_id` (`type`,`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单表';
 
 CREATE TABLE `flow` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -56,8 +56,8 @@ CREATE TABLE `flow` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_refer_id` (`refer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='通用流水表';
+KEY `idx_refer_id` (`refer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通用流水表';
 
 CREATE TABLE `relation` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -69,9 +69,9 @@ CREATE TABLE `relation` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_refer_id` (`refer_id`),
-KEY `ids_refer_id_others` (`refer_id_others`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='通用关系表';
+KEY `idx_refer_id` (`refer_id`),
+KEY `idx_refer_id_others` (`refer_id_others`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通用关系表';
 
 CREATE TABLE `company` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -85,9 +85,9 @@ CREATE TABLE `company` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_name` (`name`),
-KEY `ids_short_name` (`short_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='公司表';
+KEY `idx_name` (`name`),
+KEY `idx_short_name` (`short_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='公司表';
 
 CREATE TABLE `mini_program` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -103,7 +103,20 @@ CREATE TABLE `mini_program` (
 `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
-KEY `ids_company_id` (`company_id`),
-KEY `ids_appid` (`appid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='小程序表';
+KEY `idx_company_id` (`company_id`),
+KEY `idx_appid` (`appid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小程序表';
+
+CREATE TABLE `mini_program_version` (
+`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+`mini_program_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '小程序id',
+`code` varchar(100) NOT NULL DEFAULT '' COMMENT '版本号',
+`status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0-编辑中 1-审核中 2-已审核 3-已上线 4-已下线',
+`is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+`creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+`created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
+`updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
+PRIMARY KEY (`id`),
+KEY `idx_mini_program_id` (`mini_program_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小程序版本表';
 

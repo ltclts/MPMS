@@ -24,13 +24,14 @@ type Model struct {
 
 const (
 	//表名定义
-	ConfigTableName      = "config"
-	UserTableName        = "user"
-	MenuTableName        = "menu"
-	FlowTableName        = "flow"
-	RelationTableName    = "relation"
-	CompanyTableName     = "company"
-	MiniProgramTableName = "mini_program"
+	ConfigTableName             = "config"
+	UserTableName               = "user"
+	MenuTableName               = "menu"
+	FlowTableName               = "flow"
+	RelationTableName           = "relation"
+	CompanyTableName            = "company"
+	MiniProgramTableName        = "mini_program"
+	MiniProgramVersionTableName = "mini_program_version"
 
 	//删除标志
 	UnDeleted = 0
