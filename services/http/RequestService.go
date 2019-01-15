@@ -20,7 +20,8 @@ type Map map[string]interface{}
 func Post(param Param, url string) Response {
 	fmt.Println("params_map :", param)
 	body := new(bytes.Buffer)
-	json.NewEncoder(body).Encode(param)
+	_ = json.NewEncoder(body).Encode(param)
+
 	fmt.Println("params_str :", body)
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
@@ -29,7 +30,9 @@ func Post(param Param, url string) Response {
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err != nil {
 		return Response{2, err.Error(), Map{}}
 	}

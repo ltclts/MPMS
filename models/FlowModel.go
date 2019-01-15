@@ -16,6 +16,11 @@ type Flow struct {
 	Model
 }
 
+const (
+	FlowReferTypeMinProgram = 1 //小程序相关
+	FlowStatusCreate        = 1 //创建
+)
+
 /**
 获取流水信息
 */

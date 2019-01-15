@@ -3,6 +3,7 @@ package models
 import (
 	"MPMS/helper"
 	"MPMS/structure"
+	"encoding/json"
 	"fmt"
 )
 
@@ -12,11 +13,12 @@ MiniProgramVersion 模型
 type MiniProgramVersion struct {
 	MiniProgramId int64
 	Code          string
+	Remark        string
 	Status        uint8
+	Type          uint8
+	Content       string
 	Model
 }
-
-//0-编辑中 1-审核中 2-审核通过 3-已上线 4-已下线
 
 const (
 	MiniProgramVersionStatusInit      = 0
@@ -24,7 +26,26 @@ const (
 	MiniProgramVersionStatusApproved  = 2 //已审核
 	MiniProgramVersionStatusOnline    = 3 //已上线
 	MiniProgramVersionStatusOffline   = 4 //已下线
+
+	MiniProgramVersionBusinessCard = 1 //名片
 )
+
+func MiniProgramVersionTypeToNameMap() structure.Uint8ToStringMap {
+	return structure.Uint8ToStringMap{
+		MiniProgramVersionBusinessCard: "名片展示",
+	}
+}
+
+func GetMiniProgramVersionTypeNameByType(_type uint8) (string, error) {
+	if name := MiniProgramVersionTypeToNameMap()[_type]; name != "" {
+		return name, nil
+	}
+	return "", helper.CreateNewError(fmt.Sprintf("invalid MiniProgram Type : %d", _type))
+}
+
+func (mpv *MiniProgramVersion) GetTypeName() (string, error) {
+	return GetMiniProgramVersionTypeNameByType(mpv.Type)
+}
 
 func MiniProgramVersionStatusToNameMap() structure.Uint8ToStringMap {
 	return structure.Uint8ToStringMap{
@@ -94,10 +115,24 @@ func (mpv *MiniProgramVersion) Count(where structure.StringToObjectMap) (int64, 
 }
 
 func (mpv *MiniProgramVersion) Insert(insMap structure.StringToObjectMap) (int64, error) {
+	if content := insMap["content"]; content != nil {
+		content, err := json.Marshal(content)
+		if err != nil {
+			return 0, err
+		}
+		insMap["content"] = content
+	}
 	return mpv.insertExec(insMap, mpv.getFieldsMap, MiniProgramVersionTableName)
 }
 
 func (mpv *MiniProgramVersion) Update(toUpdate structure.StringToObjectMap, where structure.StringToObjectMap) (int64, error) {
+	if content := toUpdate["content"]; content != nil {
+		content, err := json.Marshal(content)
+		if err != nil {
+			return 0, err
+		}
+		toUpdate["content"] = content
+	}
 	return mpv.updateExec(toUpdate, where, mpv.getFieldsMap, MiniProgramVersionTableName)
 }
 
@@ -109,6 +144,9 @@ func (mpv *MiniProgramVersion) getFieldsMap() structure.StringToObjectMap {
 		"id":              &mpv.Id,
 		"code":            &mpv.Code,
 		"mini_program_id": &mpv.MiniProgramId,
+		"remark":          &mpv.Remark,
+		"content":         &mpv.Content,
+		"type":            &mpv.Type,
 		"status":          &mpv.Status,
 		"is_deleted":      &mpv.IsDeleted,
 		"creator_id":      &mpv.CreatorId,

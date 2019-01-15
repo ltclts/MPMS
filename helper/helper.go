@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+const (
+	OperateTypeCreate = 1
+	OperateTypeEdit   = 2
+)
+
 func GetRandomStrBy(strLen uint) string {
 	return GetRandomStr(strLen, "")
 }

@@ -425,3 +425,8 @@ fieldset legend {
 .mt-10 {
     margin-top: 10px;
 }
+
+.mini-program-content{
+    padding: 10px 100px;
+
+}

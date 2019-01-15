@@ -34,6 +34,10 @@ func init() {
 	Routes = append(Routes, Route{uris.HtmlUriCompany, &controllers.CompanyController{}, "get:Index"})
 	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramCreate, &controllers.MPController{}, "get:Create"})
+	Routes = append(Routes, Route{uris.HtmlUriMiniProgramEdit, &controllers.MPController{}, "get:Edit"})
+
+	//小程序创建、编辑接口
+	Routes = append(Routes, Route{uris.ApiUriMiniProgramEdit, &api.MPApiController{}, "post:Edit"})
 
 	/**
 	外部调用接口
