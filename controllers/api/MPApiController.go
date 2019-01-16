@@ -5,7 +5,6 @@ import (
 	"MPMS/models"
 	"MPMS/session"
 	"MPMS/structure"
-	"fmt"
 )
 
 /**
@@ -35,7 +34,7 @@ func (mp *MPApiController) Edit() {
 	if helper.OperateTypeCreate == req.OperateType { //创建
 		mpIns, err := mp.create(req.MPInfoReq)
 		if err != nil {
-			mp.ApiReturn(structure.Response{Error: 2, Msg: fmt.Sprintf("创建失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+			mp.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 		mp.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"mp_id": mpIns.Id}})

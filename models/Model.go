@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
+	"runtime/debug"
 	"strings"
 )
 
@@ -101,10 +102,18 @@ func (b *Model) Commit() error {
 /**
 查询方法
 */
-func (b *Model) query(sql string, args ...interface{}) (*sql.Rows, error) {
+func (b *Model) query(sql string, args ...interface{}) (rows *sql.Rows, err error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = helper.CreateNewError(fmt.Sprintf("%s", r))
+			debug.PrintStack()
+		}
+	}()
+
 	if db == nil {
 		if _, err := b.initDB(); err != nil {
-			return nil, err
+			return rows, err
 		}
 	}
 
@@ -119,11 +128,18 @@ func (b *Model) query(sql string, args ...interface{}) (*sql.Rows, error) {
 /**
 执行方法
 */
-func (b *Model) exec(sql string, args ...interface{}) (sql.Result, error) {
+func (b *Model) exec(sql string, args ...interface{}) (result sql.Result, err error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = helper.CreateNewError(fmt.Sprintf("%s", r))
+			debug.PrintStack()
+		}
+	}()
 
 	if db == nil {
 		if _, err := b.initDB(); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
@@ -156,7 +172,7 @@ func (b *Model) quickQueryWithExtra(fields []string, getFieldsMap func() structu
 		return nil, nil, err
 	}
 	rows, err := b.query(fmt.Sprintf("SELECT %s FROM `%s` WHERE %s %s", fieldsStr, table, whereStr, extra), whereValue...)
-	return rows, fieldsAddr, nil
+	return rows, fieldsAddr, err
 }
 
 func (b *Model) count(getFieldsMap func() structure.StringToObjectMap, where structure.StringToObjectMap, table string) (int64, error) {

@@ -59,10 +59,10 @@
                     operate_type: _this.operateType,
                     mp_info: mpInfo,
                 }
-            }, {loadingText: "处理中，请稍后..."}).done(function (resp) {
+            }, {loadingText: "操作中，请稍后..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
-                    layer.popupError("处理失败：" + resp.msg);
+                    layer.popupError("操作失败：" + resp.msg);
                     _this.$btnEdit.removeClass("disabled");
                     return false;
                 }
