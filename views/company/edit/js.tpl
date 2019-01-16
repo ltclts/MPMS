@@ -1,8 +1,9 @@
 <script type="text/javascript">
 
-    let mp = {
+    let company = {
         id:{{.Id}},
         operateType: +{{.OperateType}},
+        urlApiCompanyGetEditInfo:{{.ApiUriCompanyGetEditInfo}},
         urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlApiCompanyEdit:{{.ApiUriCompanyEdit}},
         $btnEdit: $('.btn-edit'),
@@ -16,7 +17,6 @@
         userFieldToInputNameMap: {
             'name': 'contact-user-name',
             'email': 'contact-user-email',
-            'check_code': 'contact-user-check-code',
             'phone': 'contact-user-phone'
         },
         init: function () {
@@ -51,10 +51,50 @@
         },
         initHtml: function () {
             let _this = this;
+
+            if (1 === _this.operateType) {
+                _this.$checkCode.show();
+                //增加校验码必传校验
+                _this.userFieldToInputNameMap['check_code'] = 'contact-user-check-code';
+            }
+
             if (2 === _this.operateType) {
                 _this.$btnEdit.attr("title", "保存");
                 _this.$btnEdit.html("保存");
+
+                //获取公司数据
+                _this.initHtmlInfo();
             }
+        },
+        initHtmlInfo: function () {
+            let _this = this;
+            layer.ajax({
+                url: _this.urlApiCompanyGetEditInfo,
+                type: 'get',
+                data: {
+                    id: _this.id
+                }
+            }, {loadingText: "数据加载中，请稍后..."}).done(function (resp) {
+                console.log(resp);
+                if (0 !== +resp.error) {
+                    layer.popupError("数据失败：" + resp.msg);
+                    return false;
+                }
+
+                //下划线转大驼峰
+                if (resp.info.company_info) {
+                    $.each(_this.companyFieldToInputNameMap, function (k, v) {
+                        $('input[name="' + v + '"]').val(resp.info.company_info[k.toLargeHump()]);
+                    })
+                }
+
+                if (resp.info.user_info) {
+                    $.each(_this.userFieldToInputNameMap, function (k, v) {
+                        $('input[name="' + v + '"]').val(resp.info.user_info[k.toLargeHump()]);
+                    })
+                }
+
+            });
         },
         edit: function () {
             let _this = this;
@@ -100,7 +140,7 @@
                     return false;
                 }
                 if (_this.operateType === 1) {
-                    // location.href = _this.urlHtmlMiniProgramEdit + '?mp_id=' + resp.info.mp_id;
+                    location.href = _this.urlHtmlCompanyEdit + '?company_id=' + resp.info.id;
                 } else {
                     layer.popupMsg("编辑成功！")
                 }
@@ -110,6 +150,6 @@
     };
 
     $(function () {
-        mp.init();
+        company.init();
     });
 </script>

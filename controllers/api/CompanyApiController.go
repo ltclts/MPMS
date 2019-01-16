@@ -30,12 +30,22 @@ func (c *CompanyApiController) List() {
 	user := models.User{}
 	program := models.MiniProgram{}
 	companyWhereMap := structure.StringToObjectMap{"is_deleted": models.UnDeleted}
+
+	if c.GetSession(session.UserType).(uint8) == models.UserTypeCustomer && listReq.Id == 0 { //如果是用户登陆并且没有id 则获取
+		company, err := c.getSessionCompanyInfo()
+		if err != nil {
+			c.ApiReturn(structure.Response{Error: 2, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+			return
+		}
+		listReq.Id = company.Id
+	}
+
 	if listReq.Id != 0 {
 		companyWhereMap["id"] = listReq.Id
 	}
 	companies, err := company.Select([]string{"id", "short_name", "creator_id", "expire_at"}, companyWhereMap)
 	if err != nil {
-		c.ApiReturn(structure.Response{Error: 2, Msg: fmt.Sprintf("获取数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+		c.ApiReturn(structure.Response{Error: 3, Msg: fmt.Sprintf("获取数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
 		return
 	}
 
@@ -44,7 +54,7 @@ func (c *CompanyApiController) List() {
 		listItem := structure.StringToObjectMap{"id": item.Id, "name": item.ShortName, "status": statusName, "expire_at": item.ExpireAt}
 		user, err = user.GetContactUserByCompanyId(item.Id)
 		if err != nil {
-			c.ApiReturn(structure.Response{Error: 3, Msg: fmt.Sprintf("获取联系人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+			c.ApiReturn(structure.Response{Error: 4, Msg: fmt.Sprintf("获取联系人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
 			return
 		}
 
@@ -57,7 +67,7 @@ func (c *CompanyApiController) List() {
 			"id":         item.CreatorId,
 		})
 		if err != nil {
-			c.ApiReturn(structure.Response{Error: 4, Msg: fmt.Sprintf("获取创建人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+			c.ApiReturn(structure.Response{Error: 5, Msg: fmt.Sprintf("获取创建人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
 			return
 		}
 
@@ -165,4 +175,47 @@ func (c *CompanyApiController) create(companyInfo CompanyInfo, userInfo UserInfo
 
 	err = company.Commit()
 	return company, err
+}
+
+func (c *CompanyApiController) GetEditInfo() {
+	req := struct {
+		Id int64 `form:"id"`
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if c.GetSession(session.UserType).(uint8) == models.UserTypeCustomer && req.Id == 0 { //如果是用户登陆并且没有id 则获取
+		company, err := c.getSessionCompanyInfo()
+		if err != nil {
+			c.ApiReturn(structure.Response{Error: 2, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+			return
+		}
+		req.Id = company.Id
+	}
+
+	companyWhereMap := structure.StringToObjectMap{"is_deleted": models.UnDeleted, "id": req.Id}
+	company := models.Company{}
+	_, err := company.SelectOne([]string{}, companyWhereMap)
+	if err != nil {
+		c.ApiReturn(structure.Response{Error: 3, Msg: fmt.Sprintf("获取数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if company.Id == 0 {
+		c.ApiReturn(structure.Response{Error: 3, Msg: "没有获取到公司信息！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	user := models.User{}
+	user, err = user.GetContactUserByCompanyId(company.Id)
+	if err != nil {
+		c.ApiReturn(structure.Response{Error: 4, Msg: fmt.Sprintf("获取联系人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
+		return
+	}
+	c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{
+		"company_info": company,
+		"user_info":    user,
+	}})
 }

@@ -17,7 +17,8 @@
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default"
                                                           type="button">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称</button></span>
-                    <input type="text" class="form-control bg-danger" name="company-name" placeholder="公司全称" maxlength="50">
+                    <input type="text" class="form-control bg-danger" name="company-name" placeholder="公司全称"
+                           maxlength="50">
                 </div>
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default"
@@ -27,8 +28,8 @@
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default"
                                                           type="button">到期时间</button></span>
-                    <input type="text" class="form-control form-date" name="company-expire-at"
-                           placeholder="过期时间 YYYY-MM-DD">
+                    <input type="text" class="form-control form-datetime" name="company-expire-at"
+                           placeholder="过期时间 YYYY-MM-DD H:i:s">
                 </div>
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default"
@@ -54,7 +55,7 @@
                     <input type="email" class="form-control" name="contact-user-email" placeholder="登陆邮箱"
                            maxlength="50">
                 </div>
-                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3 hidden">
                     <span class="input-group-btn"><button class="btn btn-default"
                                                           type="button">邮箱验证</button></span>
                     <input type="text" class="form-control" name="contact-user-check-code" placeholder="验证码"

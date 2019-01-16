@@ -40,6 +40,7 @@ func init() {
 
 	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
 	Routes = append(Routes, Route{uris.ApiUriCompanyEdit, &api.CompanyApiController{}, "post:Edit"})
+	Routes = append(Routes, Route{uris.ApiUriCompanyGetEditInfo, &api.CompanyApiController{}, "get:GetEditInfo"})
 
 	//小程序创建、编辑接口
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramEdit, &api.MPApiController{}, "post:Edit"})

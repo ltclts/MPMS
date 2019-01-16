@@ -97,6 +97,30 @@ func (c *Company) Select(fields []string, where structure.StringToObjectMap) ([]
 	return companies, err
 }
 
+/**
+获取公司信息
+*/
+func (c *Company) SelectOne(fields []string, where structure.StringToObjectMap) (company Company, err error) {
+	rows, fieldsAddr, err := c.quickQuery(fields, c.getFieldsMap, where, CompanyTableName)
+	if err != nil {
+		return company, err
+	}
+
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	for rows.Next() {
+		err = rows.Scan(fieldsAddr...)
+		if err != nil {
+			return company, err
+		}
+		return *c, err
+	}
+
+	return company, err
+}
+
 func (c *Company) Insert(insMap structure.StringToObjectMap) (int64, error) {
 	return c.insertExec(insMap, c.getFieldsMap, CompanyTableName)
 }

@@ -279,9 +279,9 @@
             yes = option;
             option = null;
         }
-        if (!cancel && option && option.cancelText || typeof(cancel) === 'string') {
+        if (!cancel && option && option.cancelText || typeof (cancel) === 'string') {
             console.warn('cancel is set by cancelText');
-            let cancelText = typeof(cancel) === 'string' ? cancel : option.cancelText;
+            let cancelText = typeof (cancel) === 'string' ? cancel : option.cancelText;
             cancel = function () {
                 layer.popupMsg(cancelText)
             }
@@ -295,8 +295,8 @@
 })();
 
 !(function (undefined/*页面初始化*/) {
-    let  $treeMenu = $('#treeMenu');
-    $treeMenu && $treeMenu.on('click', 'a', function() {
+    let $treeMenu = $('#treeMenu');
+    $treeMenu && $treeMenu.on('click', 'a', function () {
         $('#treeMenu li.active').removeClass('active');
         $(this).closest('li').addClass('active');
     });
@@ -360,7 +360,7 @@
         startView: 2,
         forceParse: 0,
         showMeridian: 1,
-        format: "yyyy-mm-dd hh:ii"
+        format: "yyyy-mm-dd hh:ii:ss"
     });
 
     $.fn.tooltip && $('[data-toggle=tooltip]').tooltip();
@@ -382,4 +382,17 @@
         });
     });
 
+})();
+
+!(function () {
+    if (typeof String.prototype.toLargeHump == 'undefined') {
+        //下划线转大驼峰
+        String.prototype.toLargeHump = function () {
+            let str = this;
+            let re = /_(\w)/g;
+            return str.charAt(0).toUpperCase() + (str.slice(1).replace(re, function ($0, $1) {
+                return $1.toUpperCase();
+            }));
+        }
+    }
 })();

@@ -100,7 +100,7 @@ func (u *User) GetContactUserByCompanyId(companyId int64) (user User, err error)
 	}
 	if len(relations) == 1 {
 		//联系人
-		users, err := u.Select([]string{"name", "phone"}, structure.StringToObjectMap{
+		users, err := u.Select([]string{"name", "phone", "id", "email"}, structure.StringToObjectMap{
 			"is_deleted": UnDeleted,
 			"id":         relations[0].ReferIdOthers,
 		})

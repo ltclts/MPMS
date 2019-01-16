@@ -37,7 +37,7 @@ func (mp *MPApiController) Edit() {
 			mp.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
-		mp.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"mp_id": mpIns.Id}})
+		mp.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"id": mpIns.Id}})
 		return
 	}
 

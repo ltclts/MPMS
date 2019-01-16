@@ -15,8 +15,9 @@ const (
 	ApiUriLogin  = "/api/user/login"  //登陆接口
 	ApiUriLogout = "/api/user/logout" //登出接口
 
-	ApiUriCompanyList = "/api/company/list" //公司管理-账户管理-页面数据
-	ApiUriCompanyEdit = "/api/company/edit" //公司-创建/编辑
+	ApiUriCompanyList        = "/api/company/list"        //公司管理-账户管理-页面数据
+	ApiUriCompanyEdit        = "/api/company/edit"        //公司-创建/编辑
+	ApiUriCompanyGetEditInfo = "/api/company/getEditInfo" //公司-获取 单个
 
 	ApiUriMiniProgramEdit = "/api/mini_program/edit" //小程序-创建/编辑
 

@@ -4,6 +4,7 @@
         $datagrid: $('#datagrid'),
         $adminGroup: $('.admin-group'),
         urlGetList:{{.UrlGetList}},
+        urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlMiniProgramCreate:{{.HtmlUriMiniProgramCreate}},
         companyId:{{.CompanyId}},
         checkedItem: {},
@@ -44,6 +45,12 @@
                 }
                 //如果有companyId则是用户登陆 那么是管理员登陆
                 location.href = _this.urlMiniProgramCreate + (_this.companyId ? "" : ("?company_id=" + _this.checkedItem.id));
+            }).on('click', '.btn-edit', function () {
+                if (!_this.checkedItem) {
+                    return;
+                }
+                //如果有companyId则是用户登陆 那么是管理员登陆
+                location.href = _this.urlHtmlCompanyEdit + (_this.companyId ? "" : ("?company_id=" + _this.checkedItem.id));
             });
         },
         renderHtml: function () {
