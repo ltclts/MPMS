@@ -32,9 +32,14 @@ func init() {
 	Routes = append(Routes, Route{uris.ApiUriLogout, &api.UserApiController{}, "post:Logout"})
 
 	Routes = append(Routes, Route{uris.HtmlUriCompany, &controllers.CompanyController{}, "get:Index"})
-	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
+	Routes = append(Routes, Route{uris.HtmlUriCompanyCreate, &controllers.CompanyController{}, "get:Create"})
+	Routes = append(Routes, Route{uris.HtmlUriCompanyEdit, &controllers.CompanyController{}, "get:Edit"})
+
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramCreate, &controllers.MPController{}, "get:Create"})
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramEdit, &controllers.MPController{}, "get:Edit"})
+
+	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
+	Routes = append(Routes, Route{uris.ApiUriCompanyEdit, &api.CompanyApiController{}, "post:Edit"})
 
 	//小程序创建、编辑接口
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramEdit, &api.MPApiController{}, "post:Edit"})

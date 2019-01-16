@@ -97,6 +97,14 @@ func (c *Company) Select(fields []string, where structure.StringToObjectMap) ([]
 	return companies, err
 }
 
+func (c *Company) Insert(insMap structure.StringToObjectMap) (int64, error) {
+	return c.insertExec(insMap, c.getFieldsMap, CompanyTableName)
+}
+
+func (c *Company) Update(toUpdate structure.StringToObjectMap, where structure.StringToObjectMap) (int64, error) {
+	return c.updateExec(toUpdate, where, c.getFieldsMap, CompanyTableName)
+}
+
 /**
 field与对应关系
 */

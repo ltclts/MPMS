@@ -82,8 +82,5 @@ func (mp *MPApiController) create(req MPInfoReq) (mpIns models.MiniProgram, err 
 		return mpIns, err
 	}
 	err = mpIns.Commit()
-	if err != nil {
-		return mpIns, err
-	}
 	return mpIns, err
 }

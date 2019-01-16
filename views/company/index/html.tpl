@@ -3,9 +3,12 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
-        <div class="btn-group">
-            <a href="" class="btn btn-sm btn-create" title="公司添加">
-                <i class="icon icon-plus"></i> 公司添加
+        <div class="btn-group admin-group hidden">
+            <a href="{{.HtmlUriCompanyCreate}}" class="btn btn-sm btn-create" title="公司添加">
+                <i class="icon icon-plus"></i> 添加
+            </a>
+            <a href="" class="btn btn-sm btn-edit disabled" title="公司编辑">
+                编辑
             </a>
             <a href="javascript:void(0)" class="btn btn-sm btn-primary btn-in-use disabled" title="启用">
                 启用

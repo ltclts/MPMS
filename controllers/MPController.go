@@ -28,7 +28,7 @@ func (mp *MPController) Create() {
 	mp.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit   //编辑接口
 	mp.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit //编辑页面
 	mp.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
-	mp.RenderHtml("小程序创建", "mp", "mini_program/edit.html.tpl", "mini_program/edit.css.tpl", "mini_program/edit.js.tpl", "")
+	mp.RenderHtml("小程序创建", "mp", "mini_program/edit/html.tpl", "mini_program/edit/css.tpl", "mini_program/edit/js.tpl", "")
 }
 
 func (mp *MPController) Edit() {
@@ -41,5 +41,5 @@ func (mp *MPController) Edit() {
 	mp.Data["OperateType"] = helper.OperateTypeEdit //创建
 	mp.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit
 	mp.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
-	mp.RenderHtml("小程序编辑", "mp", "mini_program/edit.html.tpl", "mini_program/edit.css.tpl", "mini_program/edit.js.tpl", "")
+	mp.RenderHtml("小程序编辑", "mp", "mini_program/edit/html.tpl", "mini_program/edit/css.tpl", "mini_program/edit/js.tpl", "")
 }

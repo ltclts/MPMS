@@ -60,6 +60,34 @@ func (u *User) CheckPwd(pwd string) bool {
 	pwd = helper.Md5(pwd)
 	return pwd == u.Password
 }
+
+func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error) {
+	//获取6位随机密码
+	password := helper.GetRandomStrBy(6)
+	userId, err := u.Insert(structure.StringToObjectMap{
+		"name":       u.Name,
+		"email":      u.Email,
+		"phone":      u.Phone,
+		"password":   helper.Md5(password),
+		"status":     UserStatusInUse,
+		"type":       UserTypeCustomer,
+		"creator_id": creatorId,
+	})
+	if err != nil {
+		return userId, err
+	}
+	fmt.Println(fmt.Sprintf("user=%d password=%s", userId, password))
+	relation := Relation{}
+	_, err = relation.Insert(RelationReferTypeCompanyContactUser, companyId, userId, creatorId)
+	if err != nil {
+		return userId, err
+	}
+	flow := Flow{}
+	_, err = flow.Insert(userId, FlowReferTypeContactUser, FlowStatusCreate, creatorId, structure.StringToObjectMap{})
+	//todo 发送邮件
+	return userId, err
+}
+
 func (u *User) GetContactUserByCompanyId(companyId int64) (user User, err error) {
 	relation := Relation{}
 	relations, err := relation.Select([]string{"refer_id_others"}, structure.StringToObjectMap{

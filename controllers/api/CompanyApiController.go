@@ -1,7 +1,9 @@
 package api
 
 import (
+	"MPMS/helper"
 	"MPMS/models"
+	"MPMS/session"
 	"MPMS/structure"
 	"fmt"
 )
@@ -70,4 +72,97 @@ func (c *CompanyApiController) List() {
 		list = append(list, listItem)
 	}
 	c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"list": list}})
+}
+
+type CompanyInfo struct {
+	Name      string `form:"company_info[name]"`
+	ShortName string `form:"company_info[short_name]"`
+	ExpireAt  string `form:"company_info[expire_at]"`
+	Remark    string `form:"company_info[remark]"`
+}
+type UserInfo struct {
+	Name      string `form:"user_info[name]"`
+	Email     string `form:"user_info[email]"`
+	CheckCode string `form:"user_info[check_code]"`
+	Phone     string `form:"user_info[phone]"`
+}
+
+func (c *CompanyApiController) Edit() {
+
+	req := struct {
+		OperateType uint8 `form:"operate_type"`
+		CompanyInfo
+		UserInfo
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	fmt.Println(req)
+	if req.OperateType == helper.OperateTypeCreate {
+		//todo 校验码检查
+		if models.UserTypeAdmin != c.GetSession(session.UserType).(uint8) {
+			c.ApiReturn(structure.Response{Error: 2, Msg: "您没有创建公司的权限！", Info: structure.StringToObjectMap{}})
+			return
+		}
+
+		company, err := c.create(req.CompanyInfo, req.UserInfo)
+		if err != nil {
+			c.ApiReturn(structure.Response{Error: 3, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			return
+		}
+		c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"id": company.Id}})
+		return
+	}
+	c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
+
+}
+
+func (c *CompanyApiController) create(companyInfo CompanyInfo, userInfo UserInfo) (company models.Company, err error) {
+	creatorId := c.GetSession(session.UUID).(int64)
+	_, err = company.StartTrans()
+	if err != nil {
+		return company, err
+	}
+	companyId, err := company.Insert(structure.StringToObjectMap{
+		"name":       companyInfo.Name,
+		"short_name": companyInfo.ShortName,
+		"remark":     companyInfo.Remark,
+		"expire_at":  companyInfo.ExpireAt,
+		"creator_id": creatorId,
+	})
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+	//写入流水
+	flow := models.Flow{}
+	_, err = flow.Insert(companyId, models.FlowReferTypeCompany, models.FlowStatusCreate, creatorId, structure.StringToObjectMap{})
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+	company.Id = companyId
+	user := models.User{}
+	user, err = user.SelectOne([]string{"id"}, structure.StringToObjectMap{"email": userInfo.Email, "is_deleted": models.UnDeleted})
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+	if user.Id != 0 {
+		_ = company.Rollback()
+		return company, helper.CreateNewError("该邮箱已存在！")
+	}
+
+	user.Phone = userInfo.Phone
+	user.Email = userInfo.Email
+	user.Name = userInfo.Name
+	_, err = user.CreateContactUser(companyId, creatorId)
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+
+	err = company.Commit()
+	return company, err
 }

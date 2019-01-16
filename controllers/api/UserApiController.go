@@ -86,9 +86,6 @@ func (u *UserApiController) Login() {
 }
 
 func (u *UserApiController) Logout() {
-	u.SetSession(session.UUID, nil)
-	u.SetSession(session.UserName, nil)
-	u.SetSession(session.UserType, nil)
-	u.SetSession(session.CompanyInfo, nil)
+	u.DestroySession()
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"uri": uris.HtmlUriLogin}})
 }
