@@ -15,6 +15,8 @@ const (
 	ApiUriLogin  = "/api/user/login"  //登陆接口
 	ApiUriLogout = "/api/user/logout" //登出接口
 
+	ApiUriUserGetCheckCode = "/api/user/get_check_code"
+
 	ApiUriCompanyList        = "/api/company/list"        //公司管理-账户管理-页面数据
 	ApiUriCompanyEdit        = "/api/company/edit"        //公司-创建/编辑
 	ApiUriCompanyGetEditInfo = "/api/company/getEditInfo" //公司-获取 单个

@@ -22,9 +22,11 @@ func (c *CompanyController) Index() {
 }
 
 func (c *CompanyController) Create() {
-	c.Data["OperateType"] = helper.OperateTypeCreate       //创建
-	c.Data["HtmlUriCompanyEdit"] = uris.HtmlUriCompanyEdit //编辑页面
-	c.Data["ApiUriCompanyEdit"] = uris.ApiUriCompanyEdit   //编辑接口
+	c.Data["OperateType"] = helper.OperateTypeCreate               //创建
+	c.Data["HtmlUriCompanyEdit"] = uris.HtmlUriCompanyEdit         //编辑页面
+	c.Data["ApiUriCompanyEdit"] = uris.ApiUriCompanyEdit           //编辑接口
+	c.Data["ApiUriUserGetCheckCode"] = uris.ApiUriUserGetCheckCode //获取验证码
+
 	c.RenderHtml("公司创建", "company", "company/edit/html.tpl", "company/edit/css.tpl", "company/edit/js.tpl", "")
 }
 
@@ -44,7 +46,8 @@ func (c *CompanyController) Edit() {
 
 	c.Data["Id"] = req.CompanyId
 	c.Data["ApiUriCompanyGetEditInfo"] = uris.ApiUriCompanyGetEditInfo
-	c.Data["OperateType"] = helper.OperateTypeEdit       //编辑
-	c.Data["ApiUriCompanyEdit"] = uris.ApiUriCompanyEdit //编辑接口
+	c.Data["OperateType"] = helper.OperateTypeEdit                 //编辑
+	c.Data["ApiUriCompanyEdit"] = uris.ApiUriCompanyEdit           //编辑接口
+	c.Data["ApiUriUserGetCheckCode"] = uris.ApiUriUserGetCheckCode //获取验证码
 	c.RenderHtml("公司编辑", "company", "company/edit/html.tpl", "company/edit/css.tpl", "company/edit/js.tpl", "")
 }

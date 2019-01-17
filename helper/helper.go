@@ -19,7 +19,7 @@ func GetRandomStrBy(strLen uint) string {
 
 func GetRandomStr(strLen uint, str string) string {
 	if str == "" {
-		str = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+		str = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	}
 
 	bytes := []byte(str)
@@ -35,6 +35,14 @@ func GetRandomStr(strLen uint, str string) string {
 
 func Now() string {
 	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func NowDate() string {
+	return time.Now().Format("2006-01-02")
+}
+
+func NowHour() string {
+	return time.Now().Format("15")
 }
 
 func Md5(str string) string {

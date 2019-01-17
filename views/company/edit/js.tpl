@@ -6,8 +6,11 @@
         urlApiCompanyGetEditInfo:{{.ApiUriCompanyGetEditInfo}},
         urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlApiCompanyEdit:{{.ApiUriCompanyEdit}},
+        urlApiUserGetCheckCode:{{.ApiUriUserGetCheckCode}},
         $btnEdit: $('.btn-edit'),
         $checkCode: $('.check-code'),
+        $userContactEmail: $('input[name="contact-user-email"]'),
+        email: null,
         companyFieldToInputNameMap: {
             'name': 'company-name',
             'short_name': 'company-short-name',
@@ -32,8 +35,54 @@
                 _this.$btnEdit.addClass("disabled");
                 _this.edit();
             }).on('click', '.check-code', function () {
-                _this.timeWait(60);
-                _this.$checkCode.addClass('disabled');
+                let email = _this.$userContactEmail.val();
+                if (!email) {
+                    layer.popupDanger('请输入联系人邮箱！');
+                    return;
+                }
+
+                let reg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/;
+                if (!reg.test(email)) {
+                    layer.popupDanger('请正确输入邮箱！');
+                    return;
+                }
+
+                _this.getCheckCode(email);
+            }).on('keyup', 'input[name="contact-user-email"]', function () {
+                if (_this.operateType !== 2) {
+                    return false;
+                }
+
+                if (_this.$userContactEmail.val().trim() === _this.email) {
+                    _this.$checkCode.parent().parent().addClass('hidden');
+                    delete _this.userFieldToInputNameMap['check_code'];
+                }else{
+                    _this.$checkCode.parent().parent().removeClass('hidden');
+                    //增加校验码必传校验
+                    _this.userFieldToInputNameMap['check_code'] = 'contact-user-check-code';
+                }
+                console.log(_this.userFieldToInputNameMap);
+            });
+        },
+        getCheckCode: function (email) {
+            let _this = this;
+
+            _this.$checkCode.addClass('disabled');
+            layer.ajax({
+                url: _this.urlApiUserGetCheckCode,
+                type: 'get',
+                data: {
+                    email: email
+                }
+            }, {loadingText: "验证码发送中，请稍后..."}).done(function (resp) {
+                console.log(resp);
+                if (0 !== +resp.error) {
+                    layer.popupError("验证码发送失败：" + resp.msg);
+                    _this.$checkCode.removeClass('disabled');
+                    return false;
+                }
+
+                _this.timeWait(59);
             });
         },
         timeWait(wait) {
@@ -53,7 +102,7 @@
             let _this = this;
 
             if (1 === _this.operateType) {
-                _this.$checkCode.show();
+                _this.$checkCode.parent().parent().removeClass('hidden');
                 //增加校验码必传校验
                 _this.userFieldToInputNameMap['check_code'] = 'contact-user-check-code';
             }
@@ -91,7 +140,8 @@
                 if (resp.info.user_info) {
                     $.each(_this.userFieldToInputNameMap, function (k, v) {
                         $('input[name="' + v + '"]').val(resp.info.user_info[k.toLargeHump()]);
-                    })
+                    });
+                    _this.email = resp.info.user_info['Email'];
                 }
 
             });
@@ -105,7 +155,7 @@
                 if (!$item.val()) {
                     $needValFields.push($item);
                 } else {
-                    companyInfo[k] = $item.val();
+                    companyInfo[k] = $item.val().trim();
                 }
             });
             $.each(_this.userFieldToInputNameMap, function (k, v) {
@@ -113,7 +163,7 @@
                 if (!$item.val()) {
                     $needValFields.push($item);
                 } else {
-                    userInfo[k] = $item.val();
+                    userInfo[k] = $item.val().trim();
                 }
             });
 

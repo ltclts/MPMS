@@ -2,6 +2,7 @@ package filters
 
 import (
 	"MPMS/routers/uris"
+	"MPMS/services/log"
 	"MPMS/session"
 	"fmt"
 	"github.com/astaxie/beego/context"
@@ -9,6 +10,8 @@ import (
 )
 
 func FilterUser(ctx *context.Context) {
+	log.Info("access", *ctx.Request)
+
 	isLogin := false
 	if uuid := ctx.Input.Session(session.UUID); uuid != nil {
 		isLogin = true
