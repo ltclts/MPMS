@@ -41,5 +41,17 @@ func (mp *MPController) Edit() {
 	mp.Data["OperateType"] = helper.OperateTypeEdit //创建
 	mp.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit
 	mp.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
+	mp.Data["ApiUriMiniProgramList"] = uris.ApiUriMiniProgramList
 	mp.RenderHtml("小程序编辑", "mp", "mini_program/edit/html.tpl", "mini_program/edit/css.tpl", "mini_program/edit/js.tpl", "")
+}
+
+func (mp *MPController) Index() {
+	company, err := mp.getSessionCompanyInfo()
+	if nil == err {
+		mp.Data["CompanyId"] = company.Id
+	}
+	mp.Data["ApiUriMiniProgramList"] = uris.ApiUriMiniProgramList
+	mp.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit     //编辑页面
+	mp.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate //编辑页面
+	mp.RenderHtml("小程序管理", "mp", "mini_program/index/html.tpl", "mini_program/index/css.tpl", "mini_program/index/js.tpl", "")
 }

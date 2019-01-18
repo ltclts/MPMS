@@ -21,7 +21,7 @@
                 </div>
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default" type="button">Appid</button></span>
-                    <input type="text" class="form-control" name="mp-appid" placeholder="微信小程序的appid" maxlength="50">
+                    <input type="text" class="form-control" name="mp-appid" placeholder="微信小程序的appid" maxlength="50" disabled>
                 </div>
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
                     <span class="input-group-btn"><button class="btn btn-default"

@@ -22,6 +22,7 @@ const (
 	ApiUriCompanyUpdateStatus = "/api/company/updateStatus" //公司状态变更
 	ApiUriCompanyGetEditInfo  = "/api/company/getEditInfo"  //公司-获取 单个
 
+	ApiUriMiniProgramList = "/api/mini_program/list" //公司管理-账户管理-页面数据
 	ApiUriMiniProgramEdit = "/api/mini_program/edit" //小程序-创建/编辑
 
 	ApiUriMpOutPageConfigRequest = "/api/mp/out/page_config_request"
