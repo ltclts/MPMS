@@ -108,7 +108,8 @@
                 if (_this.operateType === 1) {
                     location.href = _this.urlHtmlMiniProgramEdit + '?mp_id=' + resp.info.id;
                 } else {
-                    layer.popupMsg("编辑成功！")
+                    layer.popupMsg("编辑成功！");
+                    _this.$btnEdit.removeClass("disabled");
                 }
 
             });
