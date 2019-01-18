@@ -93,7 +93,7 @@ func (u *UserApiController) Login() {
 
 func (u *UserApiController) Logout() {
 	u.DestroySession()
-	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"uri": uris.HtmlUriLogin}})
+	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"uri": uris.HtmlUriUserLogin}})
 }
 
 func (u *UserApiController) GetCheckCode() {
@@ -125,5 +125,74 @@ func (u *UserApiController) GetCheckCode() {
 	checkCode := helper.GetRandomStrBy(4)
 	email.SetMsg(email.RegisterEmail{Tos: []email.To{{Addr: req.Email}}, Code: checkCode})
 	u.SetSession(session.UserRegisterCheckCode, checkCode)
+	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{}})
+}
+
+func (u *UserApiController) GetUserInfo() {
+	req := struct {
+		Id int64 `form:"id"`
+	}{}
+	if err := u.ParseForm(&req); err != nil {
+		u.ApiReturn(structure.Response{Error: 1, Msg: "获取参数失败！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if req.Id == 0 {
+		req.Id = u.GetSession(session.UUID).(int64)
+	}
+
+	user := models.User{}
+	user, err := user.SelectOne([]string{"id", "email", "phone"}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "id": req.Id})
+	if err != nil || user.Id == 0 {
+		u.ApiReturn(structure.Response{Error: 2, Msg: "获取用户数据失败！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"user": user}})
+
+}
+
+func (u *UserApiController) InfoChange() {
+	req := struct {
+		Phone       string `form:"phone"`
+		NewPassword string `form:"new_password"`
+	}{}
+	if err := u.ParseForm(&req); err != nil {
+		u.ApiReturn(structure.Response{Error: 1, Msg: "获取参数失败！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	user := models.User{}
+	userId := u.GetSession(session.UUID).(int64)
+	if _, err := user.StartTrans(); err != nil {
+		u.ApiReturn(structure.Response{Error: 2, Msg: "信息修改失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	toUpdate := structure.StringToObjectMap{"phone": req.Phone, "password": helper.Md5(req.NewPassword)}
+	where := structure.StringToObjectMap{"id": userId}
+	updateCount, err := user.Update(toUpdate, where)
+	if err != nil {
+		_ = user.Rollback()
+		u.ApiReturn(structure.Response{Error: 3, Msg: "信息修改失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	if 1 != updateCount {
+		_ = user.Rollback()
+		u.ApiReturn(structure.Response{Error: 4, Msg: "信息修改失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	//写入流水
+	flow := models.Flow{}
+	_, err = flow.Insert(userId, models.FlowReferTypeContactUser, models.FlowStatusEdit, userId, structure.StringToObjectMap{"update": toUpdate, "where": where})
+	if err != nil {
+		_ = user.Rollback()
+		u.ApiReturn(structure.Response{Error: 5, Msg: "信息修改失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	err = user.Commit()
+	if err != nil {
+		u.ApiReturn(structure.Response{Error: 6, Msg: "信息修改失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{}})
 }

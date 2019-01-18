@@ -36,6 +36,6 @@ func FilterUser(ctx *context.Context) {
 		if strings.ToLower(ctx.Request.Method) == "get" {
 			ctx.Output.Session(session.RequestUri, uri)
 		}
-		ctx.Redirect(302, uris.HtmlUriLogin)
+		ctx.Redirect(302, uris.HtmlUriUserLogin)
 	}
 }

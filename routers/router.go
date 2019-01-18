@@ -26,11 +26,9 @@ func init() {
 	/**
 	路由设定
 	*/
-	Routes = append(Routes, Route{uris.HtmlUriIndex, &controllers.IndexController{}, "get:Get"})
-	Routes = append(Routes, Route{uris.HtmlUriLogin, &controllers.UserController{}, "get:Login"})
-	Routes = append(Routes, Route{uris.ApiUriLogin, &api.UserApiController{}, "post:Login"})
-	Routes = append(Routes, Route{uris.ApiUriLogout, &api.UserApiController{}, "post:Logout"})
-	Routes = append(Routes, Route{uris.ApiUriUserGetCheckCode, &api.UserApiController{}, "get:GetCheckCode"})
+	Routes = append(Routes, Route{uris.HtmlUriIndex, &controllers.UserController{}, "get:Get"})
+	Routes = append(Routes, Route{uris.HtmlUriUserInfoChange, &controllers.UserController{}, "get:InfoChange"})
+	Routes = append(Routes, Route{uris.HtmlUriUserLogin, &controllers.UserController{}, "get:Login"})
 
 	Routes = append(Routes, Route{uris.HtmlUriCompany, &controllers.CompanyController{}, "get:Index"})
 	Routes = append(Routes, Route{uris.HtmlUriCompanyCreate, &controllers.CompanyController{}, "get:Create"})
@@ -39,6 +37,12 @@ func init() {
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgram, &controllers.MPController{}, "get:Index"})
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramCreate, &controllers.MPController{}, "get:Create"})
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramEdit, &controllers.MPController{}, "get:Edit"})
+
+	Routes = append(Routes, Route{uris.ApiUriUserGetUserInfo, &api.UserApiController{}, "get:GetUserInfo"})
+	Routes = append(Routes, Route{uris.ApiUriUserLogin, &api.UserApiController{}, "post:Login"})
+	Routes = append(Routes, Route{uris.ApiUriUserLogout, &api.UserApiController{}, "post:Logout"})
+	Routes = append(Routes, Route{uris.ApiUriUserGetCheckCode, &api.UserApiController{}, "get:GetCheckCode"})
+	Routes = append(Routes, Route{uris.ApiUriUserInfoChange, &api.UserApiController{}, "post:InfoChange"})
 
 	Routes = append(Routes, Route{uris.ApiUriCompanyList, &api.CompanyApiController{}, "post:List"})
 	Routes = append(Routes, Route{uris.ApiUriCompanyEdit, &api.CompanyApiController{}, "post:Edit"})

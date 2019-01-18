@@ -32,7 +32,7 @@ func (b *Controller) RenderHtml(title string, pageName string, tplName string, h
 	b.Data["Title"] = title
 	b.Data["CurrentPageName"] = pageName
 	b.Data["xsrfdata"] = b.XSRFToken()
-	b.Data["ApiUriLogout"] = uris.ApiUriLogout
+	b.Data["ApiUriLogout"] = uris.ApiUriUserLogout
 	company, err := b.getSessionCompanyInfo()
 	if err != nil {
 		b.Data["CompanyName"] = "两分钱"
