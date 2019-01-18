@@ -22,6 +22,7 @@ const (
 	FlowReferTypeContactUser = 3 //联系人相关
 
 	FlowStatusCreate = 1 //创建
+	FlowStatusEdit   = 2 //编辑
 
 )
 

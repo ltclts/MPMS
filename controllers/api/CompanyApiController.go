@@ -3,6 +3,7 @@ package api
 import (
 	"MPMS/helper"
 	"MPMS/models"
+	"MPMS/services/email"
 	"MPMS/session"
 	"MPMS/structure"
 	"fmt"
@@ -85,6 +86,7 @@ func (c *CompanyApiController) List() {
 }
 
 type CompanyInfo struct {
+	Id        int64  `form:"company_info[id]"`
 	Name      string `form:"company_info[name]"`
 	ShortName string `form:"company_info[short_name]"`
 	ExpireAt  string `form:"company_info[expire_at]"`
@@ -98,7 +100,6 @@ type UserInfo struct {
 }
 
 func (c *CompanyApiController) Edit() {
-
 	req := struct {
 		OperateType uint8 `form:"operate_type"`
 		CompanyInfo
@@ -109,45 +110,157 @@ func (c *CompanyApiController) Edit() {
 		return
 	}
 	fmt.Println(req)
-	if req.OperateType == helper.OperateTypeCreate {
-		//todo 校验码检查
+	if helper.OperateTypeCreate == req.OperateType { //创建
+		if err := c.checkRegisterCode(req.UserInfo.CheckCode); err != nil {
+			c.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			return
+		}
+
 		if models.UserTypeAdmin != c.GetSession(session.UserType).(uint8) {
-			c.ApiReturn(structure.Response{Error: 2, Msg: "您没有创建公司的权限！", Info: structure.StringToObjectMap{}})
+			c.ApiReturn(structure.Response{Error: 3, Msg: "您没有创建公司的权限！", Info: structure.StringToObjectMap{}})
 			return
 		}
 
 		company, err := c.create(req.CompanyInfo, req.UserInfo)
 		if err != nil {
-			c.ApiReturn(structure.Response{Error: 3, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			c.ApiReturn(structure.Response{Error: 4, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 		c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"id": company.Id}})
 		return
+	} else if helper.OperateTypeEdit == req.OperateType { //编辑
+		if req.CompanyInfo.Id == 0 {
+			c.ApiReturn(structure.Response{Error: 5, Msg: "参数错误，请刷新重试！", Info: structure.StringToObjectMap{}})
+			return
+		}
+
+		if req.UserInfo.CheckCode != "" {
+			if err := c.checkRegisterCode(req.UserInfo.CheckCode); err != nil {
+				c.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+				return
+			}
+		}
+		_, err := c.update(req.CompanyInfo, req.UserInfo)
+		if err != nil {
+			c.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			return
+		}
+		c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
+		return
+	} else {
+		c.ApiReturn(structure.Response{Error: 1, Msg: "参数错误，请刷新重试", Info: structure.StringToObjectMap{}})
+		return
 	}
-	c.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
 
 }
 
-func (c *CompanyApiController) create(companyInfo CompanyInfo, userInfo UserInfo) (company models.Company, err error) {
-	creatorId := c.GetSession(session.UUID).(int64)
+func (c *CompanyApiController) checkRegisterCode(checkCode string) error {
+	checkCodeStored := c.GetSession(session.UserRegisterCheckCode).(string)
+	if checkCodeStored == "" {
+		return helper.CreateNewError("验证码已过期，请重新获取！")
+	}
+
+	if checkCode != checkCodeStored {
+		return helper.CreateNewError("验证码不正确！")
+	}
+
+	c.DelSession(session.UserRegisterCheckCode)
+	return nil
+}
+
+func (c *CompanyApiController) update(companyInfo CompanyInfo, userInfo UserInfo) (company models.Company, err error) {
+	operatorId := c.GetSession(session.UUID).(int64)
 	_, err = company.StartTrans()
 	if err != nil {
 		return company, err
 	}
-	companyId, err := company.Insert(structure.StringToObjectMap{
+	infoToUpdate := structure.StringToObjectMap{
 		"name":       companyInfo.Name,
 		"short_name": companyInfo.ShortName,
 		"remark":     companyInfo.Remark,
 		"expire_at":  companyInfo.ExpireAt,
-		"creator_id": creatorId,
-	})
+	}
+	updateCount, err := company.Update(infoToUpdate, structure.StringToObjectMap{"id": companyInfo.Id})
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+	if 1 != updateCount {
+		_ = company.Rollback()
+		return company, helper.CreateNewError("更新公司信息失败！")
+	}
+	//写入流水
+	flow := models.Flow{}
+	_, err = flow.Insert(companyInfo.Id, models.FlowReferTypeCompany, models.FlowStatusEdit, operatorId, infoToUpdate)
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+
+	user := models.User{}
+	user, err = user.GetContactUserByCompanyId(companyInfo.Id)
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+
+	userExisted := models.User{}
+	if user.Email != userInfo.Email {
+		_, err := userExisted.SelectOne([]string{"id"}, structure.StringToObjectMap{"email": userInfo.Email, "is_deleted": models.UnDeleted})
+		if err != nil {
+			_ = company.Rollback()
+			return company, err
+		}
+
+		if userExisted.Id != user.Id {
+			_ = company.Rollback()
+			return company, helper.CreateNewError("该邮箱已注册！")
+		}
+	}
+
+	userInfoToUpdate := structure.StringToObjectMap{"name": userInfo.Name, "email": userInfo.Email, "phone": userInfo.Phone}
+	updateCount, err = user.Update(userInfoToUpdate, structure.StringToObjectMap{"id": user.Id})
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+	if 1 != updateCount {
+		_ = company.Rollback()
+		return company, helper.CreateNewError("更新联系人信息失败！")
+	}
+
+	_, err = flow.Insert(user.Id, models.FlowReferTypeContactUser, models.FlowStatusEdit, operatorId, userInfoToUpdate)
+	if err != nil {
+		_ = company.Rollback()
+		return company, err
+	}
+
+	err = company.Commit()
+	return company, err
+}
+
+func (c *CompanyApiController) create(companyInfo CompanyInfo, userInfo UserInfo) (company models.Company, err error) {
+	operatorId := c.GetSession(session.UUID).(int64)
+	_, err = company.StartTrans()
+	if err != nil {
+		return company, err
+	}
+
+	infoToSave := structure.StringToObjectMap{
+		"name":       companyInfo.Name,
+		"short_name": companyInfo.ShortName,
+		"remark":     companyInfo.Remark,
+		"expire_at":  companyInfo.ExpireAt,
+		"creator_id": operatorId,
+	}
+	companyId, err := company.Insert(infoToSave)
 	if err != nil {
 		_ = company.Rollback()
 		return company, err
 	}
 	//写入流水
 	flow := models.Flow{}
-	_, err = flow.Insert(companyId, models.FlowReferTypeCompany, models.FlowStatusCreate, creatorId, structure.StringToObjectMap{})
+	_, err = flow.Insert(companyId, models.FlowReferTypeCompany, models.FlowStatusCreate, operatorId, infoToSave)
 	if err != nil {
 		_ = company.Rollback()
 		return company, err
@@ -161,19 +274,23 @@ func (c *CompanyApiController) create(companyInfo CompanyInfo, userInfo UserInfo
 	}
 	if user.Id != 0 {
 		_ = company.Rollback()
-		return company, helper.CreateNewError("该邮箱已存在！")
+		return company, helper.CreateNewError("该邮箱已注册！")
 	}
 
 	user.Phone = userInfo.Phone
 	user.Email = userInfo.Email
 	user.Name = userInfo.Name
-	_, err = user.CreateContactUser(companyId, creatorId)
+	_, err = user.CreateContactUser(companyId, operatorId)
 	if err != nil {
 		_ = company.Rollback()
 		return company, err
 	}
 
 	err = company.Commit()
+	if err == nil {
+		//注册邮件
+		email.SetMsg(email.NoticePasswordEmail{Tos: []email.To{{Name: user.Name, Addr: user.Email}}, Password: user.Password})
+	}
 	return company, err
 }
 

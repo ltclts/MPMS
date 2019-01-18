@@ -84,7 +84,7 @@ func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error
 	}
 	flow := Flow{}
 	_, err = flow.Insert(userId, FlowReferTypeContactUser, FlowStatusCreate, creatorId, structure.StringToObjectMap{})
-	//todo 发送邮件
+	u.Password = password
 	return userId, err
 }
 

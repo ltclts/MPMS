@@ -32,7 +32,7 @@ var msgChanList = make(chan InfoToSend, 500)
 
 const (
 	RegisterMsgTemplate       = `您的注册验证码为：<font color="red"><I>%s</I></font>，请将该验证码告知工作人员。`
-	NoticePasswordMsgTemplate = `您的登陆密码为：<font color="red"><I>%s</I></font>，请勿将密码告知他人！`
+	NoticePasswordMsgTemplate = `您的登陆密码为：<font color="red"><I>%s</I></font>，请勿将密码告知他人并及时更改！`
 )
 
 func init() {

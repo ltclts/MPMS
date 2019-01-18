@@ -121,6 +121,6 @@ func (u *UserApiController) GetCheckCode() {
 
 	checkCode := helper.GetRandomStrBy(4)
 	email.SetMsg(email.RegisterEmail{Tos: []email.To{{Addr: req.Email}}, Code: checkCode})
-	u.SetSession(session.UserCheckCode, checkCode)
+	u.SetSession(session.UserRegisterCheckCode, checkCode)
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{}})
 }

@@ -3,3 +3,4 @@ MPMS.exe
 tmp/*
 MPMS.exe~
 /static/img/logo.ico*
+/logs/*

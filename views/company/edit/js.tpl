@@ -56,7 +56,7 @@
                 if (_this.$userContactEmail.val().trim() === _this.email) {
                     _this.$checkCode.parent().parent().addClass('hidden');
                     delete _this.userFieldToInputNameMap['check_code'];
-                }else{
+                } else {
                     _this.$checkCode.parent().parent().removeClass('hidden');
                     //增加校验码必传校验
                     _this.userFieldToInputNameMap['check_code'] = 'contact-user-check-code';
@@ -150,6 +150,8 @@
             let _this = this;
             let companyInfo = {}, userInfo = {};
             let $needValFields = [];
+
+
             $.each(_this.companyFieldToInputNameMap, function (k, v) {
                 let $item = $('input[name="' + v + '"]');
                 if (!$item.val()) {
@@ -174,6 +176,15 @@
                 return;
             }
 
+            if (_this.operateType === 2) {
+                if (!_this.id) {
+                    layer.popupDanger('参数错误，请刷新页面重试！');
+                    return;
+                }
+                companyInfo['id'] = _this.id;
+            }
+
+
             layer.ajax({
                 url: _this.urlApiCompanyEdit,
                 type: 'post',
@@ -190,11 +201,15 @@
                     return false;
                 }
                 if (_this.operateType === 1) {
-                    location.href = _this.urlHtmlCompanyEdit + '?company_id=' + resp.info.id;
+                    layer.popupMsg("创建成功！");
+                    setTimeout(function () {
+                        location.href = _this.urlHtmlCompanyEdit + '?company_id=' + resp.info.id;
+                    }, 1000)
                 } else {
-                    layer.popupMsg("编辑成功！")
+                    layer.popupMsg("编辑成功！");
+                    _this.$btnEdit.removeClass("disabled");
+                    return true;
                 }
-
             });
         },
     };
