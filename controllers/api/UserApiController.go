@@ -82,9 +82,12 @@ func (u *UserApiController) Login() {
 	if requestUri != nil {
 		redirect = requestUri.(string)
 	} else {
-		redirect = uris.HtmlUriIndex
+		if m.Type == models.UserTypeCustomer {
+			redirect = uris.HtmlUriMiniProgram
+		} else {
+			redirect = uris.HtmlUriCompany
+		}
 	}
-
 	u.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{"uri": redirect}})
 }
 
