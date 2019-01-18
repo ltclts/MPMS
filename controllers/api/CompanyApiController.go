@@ -44,7 +44,7 @@ func (c *CompanyApiController) List() {
 	if listReq.Id != 0 {
 		companyWhereMap["id"] = listReq.Id
 	}
-	companies, err := company.Select([]string{"id", "short_name", "creator_id", "expire_at"}, companyWhereMap)
+	companies, err := company.Select([]string{"id", "short_name", "creator_id", "status", "expire_at"}, companyWhereMap)
 	if err != nil {
 		c.ApiReturn(structure.Response{Error: 3, Msg: fmt.Sprintf("获取数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
 		return
@@ -52,7 +52,7 @@ func (c *CompanyApiController) List() {
 
 	for _, item := range companies {
 		statusName, _ := item.GetStatusName()
-		listItem := structure.StringToObjectMap{"id": item.Id, "name": item.ShortName, "status": statusName, "expire_at": item.ExpireAt}
+		listItem := structure.StringToObjectMap{"id": item.Id, "name": item.ShortName, "status": item.Status, "status_name": statusName, "expire_at": item.ExpireAt}
 		user, err = user.GetContactUserByCompanyId(item.Id)
 		if err != nil {
 			c.ApiReturn(structure.Response{Error: 4, Msg: fmt.Sprintf("获取联系人数据失败：%s", err.Error()), Info: structure.StringToObjectMap{}})
@@ -335,4 +335,65 @@ func (c *CompanyApiController) GetEditInfo() {
 		"company_info": company,
 		"user_info":    user,
 	}})
+}
+
+func (c *CompanyApiController) UpdateStatus() {
+
+	if models.UserTypeAdmin != c.GetSession(session.UserType).(uint8) {
+		c.ApiReturn(structure.Response{Error: 3, Msg: "您没有修改权限！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	operatorId := c.GetSession(session.UUID).(int64)
+	req := struct {
+		Id         int64 `form:"id"`
+		ToStatus   uint8 `form:"to_status"`
+		FromStatus uint8 `form:"from_status"`
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if 0 == req.Id || 0 == req.ToStatus {
+		c.ApiReturn(structure.Response{Error: 2, Msg: "参数错误，请重试！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	if _, err := models.GetCompanyStatusNameByStatus(req.ToStatus); err != nil {
+		c.ApiReturn(structure.Response{Error: 3, Msg: "非法操作", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	company := models.Company{}
+	if _, err := company.StartTrans(); err != nil {
+		c.ApiReturn(structure.Response{Error: 4, Msg: "状态变更失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	toUpdate := structure.StringToObjectMap{"status": req.ToStatus}
+	where := structure.StringToObjectMap{"id": req.Id, "status": req.FromStatus}
+	updateCount, err := company.Update(toUpdate, where)
+	if err != nil {
+		_ = company.Rollback()
+		c.ApiReturn(structure.Response{Error: 5, Msg: "状态变更失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	if 1 != updateCount {
+		_ = company.Rollback()
+		c.ApiReturn(structure.Response{Error: 6, Msg: "状态变更失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	//写入流水
+	flow := models.Flow{}
+	_, err = flow.Insert(req.Id, models.FlowReferTypeCompany, models.FlowStatusEdit, operatorId, structure.StringToObjectMap{"update": toUpdate, "where": where})
+	if err != nil {
+		_ = company.Rollback()
+		c.ApiReturn(structure.Response{Error: 7, Msg: "状态变更失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	err = company.Commit()
+	if err != nil {
+		c.ApiReturn(structure.Response{Error: 8, Msg: "状态变更失败，请联系技术人员！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	c.ApiReturn(structure.Response{Error: 0, Msg: "ok！", Info: structure.StringToObjectMap{}})
 }

@@ -6,6 +6,7 @@
         urlGetList:{{.UrlGetList}},
         urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlMiniProgramCreate:{{.HtmlUriMiniProgramCreate}},
+        urlApiCompanyUpdateStatus:{{.ApiUriCompanyUpdateStatus}},
         companyId:{{.CompanyId}},
         checkedItem: {},
         $inUse: $('.btn-in-use'),
@@ -51,7 +52,38 @@
                 }
                 //如果有companyId则是用户登陆 那么是管理员登陆
                 location.href = _this.urlHtmlCompanyEdit + (_this.companyId ? "" : ("?company_id=" + _this.checkedItem.id));
+            }).on('click', '.btn-in-use', function () {
+                //启用
+                if (!_this.checkedItem) {
+                    return;
+                }
+                _this.updateStatus(1);
+            }).on('click', '.btn-forbidden', function () {
+                //禁用
+                if (!_this.checkedItem) {
+                    return;
+                }
+                _this.updateStatus(2);
             });
+        },
+        updateStatus: function (status) {
+            let _this = this;
+            console.log(_this.checkedItem);
+            let actName = status === 1 ? '启用' : (status === 2 ? '禁用' : '该');
+            layer.dangerConfirm('确认进行' + actName + '操作？', function () {
+                layer.ajax({
+                    url: _this.urlApiCompanyUpdateStatus,
+                    type: 'post',
+                    data: {id: _this.checkedItem.id, to_status: status, from_status: _this.checkedItem.status}
+                }, {loadingText: "操作处理中..."}).done(function (resp) {
+                    if (0 !== +resp.error) {
+                        layer.popupError("操作处理失败！" + resp.msg);
+                        return false;
+                    }
+                    layer.popupMsg(actName + "成功！");
+                    location.reload();
+                });
+            })
         },
         renderHtml: function () {
             let _this = this;
@@ -68,7 +100,7 @@
             }, {loadingText: "数据加载中..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
-                    layer.popupMsg("获取数据失败！" + resp.msg);
+                    layer.popupError("获取数据失败！" + resp.msg);
                     return false;
                 }
                 _this.renderDataTable(resp.info);
@@ -83,7 +115,7 @@
                         {name: 'company_contact_user', label: '联系人'},
                         {name: 'company_contact_user_phone', label: '联系电话'},
                         {name: 'mp_count', label: '小程序数量'},
-                        {name: 'status', label: '当前状态'},
+                        {name: 'status_name', label: '当前状态'},
                         {name: 'creator', label: '创建人'},
                         {name: 'expire_at', label: '过期时间', width: 160},
                     ],

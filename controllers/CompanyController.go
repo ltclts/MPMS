@@ -18,6 +18,7 @@ func (c *CompanyController) Index() {
 	c.Data["HtmlUriCompanyCreate"] = uris.HtmlUriCompanyCreate //创建页面
 	c.Data["HtmlUriCompanyEdit"] = uris.HtmlUriCompanyEdit     //编辑页面
 	c.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate
+	c.Data["ApiUriCompanyUpdateStatus"] = uris.ApiUriCompanyUpdateStatus //状态变更接口
 	c.RenderHtml("账户管理", "company", "company/index/html.tpl", "company/index/css.tpl", "company/index/js.tpl", "")
 }
 

@@ -64,7 +64,7 @@ func (u *User) CheckPwd(pwd string) bool {
 func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error) {
 	//获取6位随机密码
 	password := helper.GetRandomStrBy(6)
-	userId, err := u.Insert(structure.StringToObjectMap{
+	toInsertInfo := structure.StringToObjectMap{
 		"name":       u.Name,
 		"email":      u.Email,
 		"phone":      u.Phone,
@@ -72,7 +72,8 @@ func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error
 		"status":     UserStatusInUse,
 		"type":       UserTypeCustomer,
 		"creator_id": creatorId,
-	})
+	}
+	userId, err := u.Insert(toInsertInfo)
 	if err != nil {
 		return userId, err
 	}
@@ -83,7 +84,7 @@ func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error
 		return userId, err
 	}
 	flow := Flow{}
-	_, err = flow.Insert(userId, FlowReferTypeContactUser, FlowStatusCreate, creatorId, structure.StringToObjectMap{})
+	_, err = flow.Insert(userId, FlowReferTypeContactUser, FlowStatusCreate, creatorId, toInsertInfo)
 	u.Password = password
 	return userId, err
 }
