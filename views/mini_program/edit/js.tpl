@@ -32,7 +32,7 @@
             let _this = this;
 
             if (1 === _this.operateType) {
-                _this.$mpAppid.removeClass('disabled');
+                _this.$mpAppid.removeAttr('disabled');
             }
 
             if (2 === _this.operateType) {

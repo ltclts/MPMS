@@ -10,20 +10,18 @@
         </div>
 
         <div class="list common-content">
-            <header>
-                <h2>主体信息</h2>
-            </header>
             <section class="items mt-10">
-                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-2">
                     <span class="input-group-btn"><button class="btn btn-default"
                                                           type="button">名&nbsp;&nbsp;&nbsp;称</button></span>
                     <input type="text" class="form-control" name="mp-name" placeholder="小程序名称" maxlength="50">
                 </div>
-                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-2">
                     <span class="input-group-btn"><button class="btn btn-default" type="button">Appid</button></span>
-                    <input type="text" class="form-control" name="mp-appid" placeholder="微信小程序的appid" maxlength="50" disabled>
+                    <input type="text" class="form-control" name="mp-appid" placeholder="微信小程序的appid" maxlength="50"
+                           disabled>
                 </div>
-                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-2">
                     <span class="input-group-btn"><button class="btn btn-default"
                                                           type="button">备&nbsp;&nbsp;&nbsp;注</button></span>
                     <input type="text" class="form-control" name="mp-remark" placeholder="该小程序用途" maxlength="50">
