@@ -5,10 +5,12 @@
         $adminGroup: $('.admin-group'),
         urlApiMiniProgramList:{{.ApiUriMiniProgramList}},
         urlHtmlMiniProgramEdit:{{.HtmlUriMiniProgramEdit}},
+        userType:{{.UserType}},
         companyId:{{.CompanyId}},
         checkedItem: {},
         $versionManage: $('.btn-version-manage'),
         $edit: $('.btn-edit'),
+        $create: $('.btn-create'),
         init: function () {
             this.render();
         },
@@ -48,6 +50,9 @@
         },
         renderHtml: function () {
             let _this = this;
+            if (_this.userType === 0) {
+                _this.$create.addClass('disabled');
+            }
 
         },
         renderData() {
