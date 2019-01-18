@@ -25,7 +25,8 @@ type MPInfoReq struct {
 
 func (mp *MPApiController) List() {
 	listReq := struct {
-		Id int64 `form:"id"`
+		Id        int64 `form:"id"`
+		CompanyId int64 `form:"company_id"`
 	}{}
 	if err := mp.ParseForm(&listReq); err != nil {
 		mp.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
@@ -36,8 +37,13 @@ func (mp *MPApiController) List() {
 	company := models.Company{}
 	user := models.User{}
 	program := models.MiniProgram{}
+	version := models.MiniProgramVersion{}
 
 	mpWhere := structure.StringToObjectMap{"is_deleted": models.UnDeleted}
+	if listReq.CompanyId != 0 {
+		mpWhere["company_id"] = listReq.CompanyId
+	}
+
 	if mp.GetSession(session.UserType).(uint8) == models.UserTypeCustomer { //如果是用户登陆并且没有id 则获取
 		company, err := mp.getSessionCompanyInfo()
 		if err != nil {
@@ -81,6 +87,9 @@ func (mp *MPApiController) List() {
 		}
 		listItem["company_name"] = company.ShortName
 		listItem["expire_at"] = company.ExpireAt
+
+		count, _ := version.Count(structure.StringToObjectMap{"mini_program_id": item.Id, "is_deleted": models.UnDeleted})
+		listItem["version_count"] = count
 		list = append(list, listItem)
 	}
 	mp.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"list": list}})

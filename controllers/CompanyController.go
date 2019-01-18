@@ -19,6 +19,7 @@ func (mp *CompanyController) Index() {
 	mp.Data["HtmlUriCompanyEdit"] = uris.HtmlUriCompanyEdit     //编辑页面
 	mp.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate
 	mp.Data["ApiUriCompanyUpdateStatus"] = uris.ApiUriCompanyUpdateStatus //状态变更接口
+	mp.Data["HtmlUriMiniProgram"] = uris.HtmlUriMiniProgram               //获取验证码
 	mp.RenderHtml("账户管理", "company", "company/index/html.tpl", "company/index/css.tpl", "company/index/js.tpl", "")
 }
 

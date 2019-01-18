@@ -19,7 +19,10 @@
         </div>
         <div class="btn-group">
             <a href="javascript:void(0)" class="btn btn-sm btn-mp-create disabled" title="小程序添加">
-                <i class="icon icon-plus"></i> 小程序添加
+                <i class="icon icon-plus"></i> 添加小程序
+            </a>
+            <a href="javascript:void(0)" class="btn btn-sm btn-mp-list disabled" title="小程序查看">
+                查看小程序
             </a>
         </div>
 

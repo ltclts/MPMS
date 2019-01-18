@@ -47,10 +47,18 @@ func (mp *MPController) Edit() {
 }
 
 func (mp *MPController) Index() {
-	company, err := mp.getSessionCompanyInfo()
-	if nil == err {
-		mp.Data["CompanyId"] = company.Id
+	req := struct {
+		CompanyId int64 `form:"company_id"`
+	}{}
+	_ = mp.ParseForm(&req)
+	if req.CompanyId == 0 && mp.GetSession(session.UserType).(uint8) == models.UserTypeCustomer {
+		company, err := mp.getSessionCompanyInfo()
+		if err != nil {
+			panic("用户没有获取到公司信息！")
+		}
+		req.CompanyId = company.Id
 	}
+	mp.Data["CompanyId"] = req.CompanyId
 	mp.Data["ApiUriMiniProgramList"] = uris.ApiUriMiniProgramList
 	mp.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit     //编辑页面
 	mp.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate //编辑页面

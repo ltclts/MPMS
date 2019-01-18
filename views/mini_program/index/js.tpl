@@ -60,7 +60,7 @@
             layer.ajax({
                 url: _this.urlApiMiniProgramList,
                 type: 'post',
-                data: {}
+                data: {company_id: _this.companyId}
             }, {loadingText: "数据加载中..."}).done(function (resp) {
                 console.log(resp);
                 if (0 !== +resp.error) {
@@ -75,11 +75,10 @@
             _this.$datagrid.datagrid({
                 dataSource: {
                     cols: [
-                        {name: 'name', label: '名称'},
-                        {name: 'company_name', label: '所属'},
-                        {name: 'remark', label: '备注'},
-                        {name: 'creator', label: '创建人'},
                         {name: 'created_at', label: '创建时间'},
+                        {name: 'name', label: '名称'},
+                        {name: 'appid', label: 'Appid'},
+                        {name: 'version_count', label: '版本数'},
                     ],
                     array: info.list
                 },

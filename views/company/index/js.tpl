@@ -7,12 +7,14 @@
         urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlMiniProgramCreate:{{.HtmlUriMiniProgramCreate}},
         urlApiCompanyUpdateStatus:{{.ApiUriCompanyUpdateStatus}},
+        urlHtmlMiniProgram:{{.HtmlUriMiniProgram}},
         companyId:{{.CompanyId}},
         checkedItem: {},
         $inUse: $('.btn-in-use'),
         $edit: $('.btn-edit'),
         $forbidden: $('.btn-forbidden'),
         $mpCreate: $('.btn-mp-create'),
+        $mpList: $('.btn-mp-list'),
         init: function () {
             this.render();
         },
@@ -32,12 +34,14 @@
                     _this.$inUse.removeClass('disabled');
                     _this.$forbidden.removeClass('disabled');
                     _this.$edit.removeClass('disabled');
+                    _this.$mpList.removeClass('disabled');
                 } else {
                     _this.checkedItem = {};
                     !_this.$mpCreate.hasClass('disabled') && _this.$mpCreate.addClass('disabled');
                     !_this.$inUse.hasClass('disabled') && _this.$inUse.addClass('disabled');
                     !_this.$forbidden.hasClass('disabled') && _this.$forbidden.addClass('disabled');
                     !_this.$edit.hasClass('disabled') && _this.$edit.addClass('disabled');
+                    !_this.$mpList.hasClass('disabled') && _this.$mpList.addClass('disabled');
                 }
                 console.log(selectItems);
             }).on('click', '.btn-mp-create', function () {
@@ -64,6 +68,12 @@
                     return;
                 }
                 _this.updateStatus(2);
+            }).on('click', '.btn-mp-list', function () {
+                if (!_this.checkedItem) {
+                    return;
+                }
+                //如果有companyId则是用户登陆 那么是管理员登陆
+                location.href = _this.urlHtmlMiniProgram + (_this.companyId ? "" : ("?company_id=" + _this.checkedItem.id));
             });
         },
         updateStatus: function (status) {
