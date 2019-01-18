@@ -3,11 +3,7 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
-        <div class="input-group btn-group">
-            <a class="btn btn-info btn-edit" title="保存">
-                保存
-            </a>
-        </div>
+
         <div class="list common-content">
             <section class="items mt-10">
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
@@ -33,6 +29,11 @@
                            maxlength="20">
                 </div>
             </section>
+            <div class="input-group btn-group col-sm-offset-3">
+                <a class="btn btn-info btn-edit" title="保存">
+                    保存
+                </a>
+            </div>
         </div>
     </div>
 </div>

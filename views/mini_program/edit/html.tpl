@@ -3,12 +3,6 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
-        <div class="input-group btn-group">
-            <a class="btn btn-info btn-edit" title="创建">
-                <i class="icon icon-plus"></i>创建
-            </a>
-        </div>
-
         <div class="list common-content">
             <section class="items mt-10">
                 <div class="input-group col-sm-6 col-xs-12 col-sm-offset-2">
@@ -27,6 +21,11 @@
                     <input type="text" class="form-control" name="mp-remark" placeholder="该小程序用途" maxlength="50">
                 </div>
             </section>
+            <div class="input-group btn-group col-sm-offset-2">
+                <a class="btn btn-info btn-edit" title="创建">
+                    <i class="icon icon-plus"></i>创建
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -3,12 +3,6 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
-        <div class="input-group btn-group">
-            <a class="btn btn-info btn-edit" title="创建">
-                <i class="icon icon-plus"></i>创建
-            </a>
-        </div>
-
         <div class="list common-content company-info">
             <header>
                 <h2>主体信息</h2>
@@ -69,6 +63,11 @@
                     <input type="tel" class="form-control" name="contact-user-phone" placeholder="手机号码" maxlength="20">
                 </div>
             </section>
+        </div>
+        <div class="input-group btn-group common-content">
+            <a class="btn btn-info btn-edit" title="创建">
+                <i class="icon icon-plus"></i>创建
+            </a>
         </div>
     </div>
 </div>
