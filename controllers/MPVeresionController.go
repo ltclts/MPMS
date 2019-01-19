@@ -5,6 +5,7 @@ import (
 	"MPMS/models"
 	"MPMS/routers/uris"
 	"MPMS/session"
+	"fmt"
 )
 
 type MPVersionController struct {
@@ -38,7 +39,7 @@ func (mpv *MPVersionController) Edit() {
 	}{}
 	_ = mpv.ParseForm(&req)
 
-	mpv.Data["Id"] = req.Id
+	mpv.Data["MpId"] = req.Id
 	mpv.Data["OperateType"] = helper.OperateTypeEdit //创建
 	mpv.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit
 	mpv.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
@@ -52,8 +53,8 @@ func (mpv *MPVersionController) Index() {
 	}{}
 	_ = mpv.ParseForm(&req)
 	mpv.Data["ApiUriMiniProgramVersionList"] = uris.ApiUriMiniProgramVersionList
-	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit     //编辑页面
-	mpv.Data["HtmlUriMiniProgramVersionCreate"] = uris.HtmlUriMiniProgramVersionCreate //创建页面
+	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit                                           //编辑页面
+	mpv.Data["HtmlUriMiniProgramVersionCreate"] = fmt.Sprintf("%s?mp_id=%d", uris.HtmlUriMiniProgramVersionCreate, req.MpId) //创建页面
 	mpv.Data["MpId"] = req.MpId
 	mpv.Data["UserType"] = mpv.GetSession(session.UserType)
 	mpv.RenderHtml("小程序版本管理", "mpv", "mini_program_version/index/html.tpl", "mini_program_version/index/css.tpl", "mini_program_version/index/js.tpl", "")

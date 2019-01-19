@@ -4,7 +4,7 @@
     </div>
     <div class="panel-body">
         <div class="btn-group">
-            <a href="{{.HtmlUriMiniProgramVersionCreate}}" class="btn btn-sm btn-create" title="版本添加">
+            <a href="{{.HtmlUriMiniProgramVersionCreate}}" class="btn btn-sm btn-create disabled" title="版本添加">
                 <i class="icon icon-plus"></i> 添加
             </a>
             <a href="javascript:void(0)" class="btn btn-sm btn-edit disabled" title="版本编辑">

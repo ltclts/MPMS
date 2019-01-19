@@ -8,6 +8,7 @@
         urlHtmlMiniProgramVersionEdit:{{.HtmlUriMiniProgramVersionEdit}},
         checkedItem: {},
         $edit: $('.btn-edit'),
+        $create: $('.btn-create'),
         init: function () {
             this.render();
         },
@@ -39,6 +40,9 @@
         },
         renderHtml: function () {
             let _this = this;
+            if (_this.MpId) {
+                _this.$create.removeClass('disabled');
+            }
         },
         renderData() {
             let _this = this;
