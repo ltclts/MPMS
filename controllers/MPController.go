@@ -60,8 +60,9 @@ func (mp *MPController) Index() {
 	}
 	mp.Data["CompanyId"] = req.CompanyId
 	mp.Data["ApiUriMiniProgramList"] = uris.ApiUriMiniProgramList
-	mp.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit     //编辑页面
-	mp.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate //编辑页面
+	mp.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit       //编辑页面
+	mp.Data["HtmlUriMiniProgramCreate"] = uris.HtmlUriMiniProgramCreate   //创建页面
+	mp.Data["HtmlUriMiniProgramVersion"] = uris.HtmlUriMiniProgramVersion //版本管理页面
 	mp.Data["UserType"] = mp.GetSession(session.UserType)
 	mp.RenderHtml("小程序管理", "mp", "mini_program/index/html.tpl", "mini_program/index/css.tpl", "mini_program/index/js.tpl", "")
 }

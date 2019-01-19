@@ -315,3 +315,14 @@ func (b *Model) renderWhere(where structure.StringToObjectMap) (string, structur
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
+
+func (b *Model) renderWhereDirectly(where structure.StringToObjectMap) (string, structure.Array) {
+	var whereIndex []string
+	var whereValue structure.Array
+	whereIndex = append(whereIndex, " 1=1 ")
+	for i, v := range where {
+		whereIndex = append(whereIndex, fmt.Sprintf(" %s= ? ", i))
+		whereValue = append(whereValue, v)
+	}
+	return strings.Join(whereIndex, "and"), whereValue
+}

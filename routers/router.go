@@ -38,6 +38,10 @@ func init() {
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramCreate, &controllers.MPController{}, "get:Create"})
 	Routes = append(Routes, Route{uris.HtmlUriMiniProgramEdit, &controllers.MPController{}, "get:Edit"})
 
+	Routes = append(Routes, Route{uris.HtmlUriMiniProgramVersion, &controllers.MPVersionController{}, "get:Index"})
+	Routes = append(Routes, Route{uris.HtmlUriMiniProgramVersionCreate, &controllers.MPVersionController{}, "get:Create"})
+	Routes = append(Routes, Route{uris.HtmlUriMiniProgramVersionEdit, &controllers.MPVersionController{}, "get:Edit"})
+
 	Routes = append(Routes, Route{uris.ApiUriUserGetUserInfo, &api.UserApiController{}, "get:GetUserInfo"})
 	Routes = append(Routes, Route{uris.ApiUriUserLogin, &api.UserApiController{}, "post:Login"})
 	Routes = append(Routes, Route{uris.ApiUriUserLogout, &api.UserApiController{}, "post:Logout"})
@@ -52,6 +56,8 @@ func init() {
 	//小程序创建、编辑接口
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramEdit, &api.MPApiController{}, "post:Edit"})
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramList, &api.MPApiController{}, "post:List"})
+
+	Routes = append(Routes, Route{uris.ApiUriMiniProgramVersionList, &api.MPVersionApiController{}, "post:List"})
 
 	/**
 	外部调用接口

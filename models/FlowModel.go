@@ -17,9 +17,10 @@ type Flow struct {
 }
 
 const (
-	FlowReferTypeMinProgram  = 1 //小程序相关
-	FlowReferTypeCompany     = 2 //公司相关
-	FlowReferTypeContactUser = 3 //联系人相关
+	FlowReferTypeMinProgram        = 1 //小程序相关
+	FlowReferTypeCompany           = 2 //公司相关
+	FlowReferTypeContactUser       = 3 //联系人相关
+	FlowReferTypeMinProgramVersion = 4 //小程序版本管理
 
 	FlowStatusCreate = 1 //创建
 	FlowStatusEdit   = 2 //编辑

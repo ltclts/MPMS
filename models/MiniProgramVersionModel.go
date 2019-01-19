@@ -89,6 +89,43 @@ func (mpv *MiniProgramVersion) SelectOne(fields []string, where structure.String
 	return version, err
 }
 
+type MpvWithRelatedInfo struct {
+	Id         int64
+	Code       string
+	Status     uint8
+	StatusName string
+	MpId       int64
+	MpName     string
+	CId        int64
+	CShortName string
+}
+
+func (mpv *MiniProgramVersion) GetList(where structure.StringToObjectMap) (list []MpvWithRelatedInfo, err error) {
+	fields := "mpv.`id`,mpv.`code`,mpv.`status`,mp.id AS mp_id,mp.`name` AS mp_name,c.short_name AS c_short_name,c.id AS c_id"
+	sql := "SELECT %s FROM mini_program_version mpv JOIN mini_program mp ON mpv.mini_program_id = mp.id JOIN company c ON mp.company_id = c.id WHERE %s %s"
+	whereStr, whereValues := mpv.renderWhereDirectly(where)
+	query := fmt.Sprintf(sql, fields, whereStr, "order by mpv.`id` desc")
+	rows, err := mpv.query(query, whereValues...)
+	if err != nil {
+		return list, err
+	}
+
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	for rows.Next() {
+		item := MpvWithRelatedInfo{}
+		err = rows.Scan(&item.Id, &item.Code, &item.Status, &item.MpId, &item.MpName, &item.CShortName, &item.CId)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, item)
+	}
+
+	return list, err
+}
+
 func (mpv *MiniProgramVersion) Select(fields []string, where structure.StringToObjectMap) ([]MiniProgramVersion, error) {
 	rows, fieldsAddr, err := mpv.quickQuery(fields, mpv.getFieldsMap, where, MiniProgramVersionTableName)
 	if err != nil {
