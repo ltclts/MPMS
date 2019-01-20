@@ -168,5 +168,5 @@ func (mpv *MPVersionApiController) edit(req MPInfoReq) (mpIns models.MiniProgram
 轮播图上传接口
 */
 func (mpv *MPVersionApiController) CarouselUpload() {
-	mpv.ApiReturn(structure.Response{Error: 1, Msg: "ok", Info: structure.StringToObjectMap{}})
+	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
 }

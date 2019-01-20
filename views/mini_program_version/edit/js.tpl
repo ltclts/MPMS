@@ -45,13 +45,17 @@
                     chunk_size: 0,
                     headers: {'X-Xsrftoken': $('meta[name=_xsrf]').attr('content')},
                     responseHandler: function (responseObject, file) {
+                        _this.$carouselUploader.data('zui.uploader').removeFile(file.id);
                         let rsp = JSON.parse(responseObject.response);
                         console.log(rsp, file);
-                        if (!+rsp.code) {
-                            layer.popupError('上传失败：' + rsp.msg);
+                        if (!+rsp.error) {
+                            layer.popupMsg('上传成功！');
                             //todo 已上传图片展示到前端
-                            _this.$carouselUploader.data('zui.uploader').removeFile(file.id);
+
+                            return;
                         }
+
+                        layer.popupError('上传失败：' + rsp.msg);
                     }
                 });
 
