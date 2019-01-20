@@ -58,6 +58,7 @@ func init() {
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramList, &api.MPApiController{}, "post:List"})
 
 	Routes = append(Routes, Route{uris.ApiUriMiniProgramVersionList, &api.MPVersionApiController{}, "post:List"})
+	Routes = append(Routes, Route{uris.ApiUriMiniProgramVersionCarouselUpload, &api.MPVersionApiController{}, "post:CarouselUpload"})
 
 	/**
 	外部调用接口

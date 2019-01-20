@@ -14,28 +14,24 @@ type MPVersionController struct {
 
 func (mpv *MPVersionController) Create() {
 	req := struct {
-		CompanyId int64 `form:"company_id"`
+		MpId int64 `form:"mp_id"`
 	}{}
 	_ = mpv.ParseForm(&req)
-	if req.CompanyId == 0 { //没有获取到公司id 那么是用户登陆 则需要获取用户id
-		company, err := mpv.getSessionCompanyInfo()
-		if err != nil {
-			panic("用户没有获取到公司信息！")
-		}
-		req.CompanyId = company.Id
+	if req.MpId == 0 { //创建必须带着小程序id 否则不允许创建
+		mpv.Data["Error"] = "参数错误，请退出页面重新进入"
 	}
 
-	mpv.Data["CompanyId"] = req.CompanyId
-	mpv.Data["OperateType"] = helper.OperateTypeCreate               //创建
-	mpv.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit   //编辑接口
-	mpv.Data["HtmlUriMiniProgramEdit"] = uris.HtmlUriMiniProgramEdit //编辑页面
+	mpv.Data["OperateType"] = helper.OperateTypeCreate //创建
+	mpv.Data["ApiUriMiniProgramVersionEdit"] = uris.ApiUriMiniProgramVersionEdit
+	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit
+	mpv.Data["ApiUriMiniProgramVersionCarouselUpload"] = uris.ApiUriMiniProgramVersionCarouselUpload
 	mpv.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
 	mpv.RenderHtml("小程序版本创建", "mpv", "mini_program_version/edit/html.tpl", "mini_program_version/edit/css.tpl", "mini_program_version/edit/js.tpl", "")
 }
 
 func (mpv *MPVersionController) Edit() {
 	req := struct {
-		Id int64 `form:"mp_id"`
+		Id int64 `form:"mini_program_version_id"`
 	}{}
 	_ = mpv.ParseForm(&req)
 
