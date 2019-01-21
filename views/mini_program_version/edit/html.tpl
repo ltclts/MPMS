@@ -26,14 +26,20 @@
             <section class="items mt-10">
                 <div>
                     <header class="col-sm-offset-2">
-                        <h3>轮播图上传（最多上传5张）</h3>
+                        <h3>轮播图上传（最多可上传4张）</h3>
                     </header>
-                    <div id="carouselUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader">
+                    <div class="carousel-img-list col-sm-6 col-xs-12 col-sm-offset-3">
+                        <div class="col-sm-3 col-xs-3 carousel-img-template hidden">
+                            <img src="" id="">
+                        </div>
+                    </div>
+                    <div id="carouselUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader mt-10">
                         <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
                         <button type="button" class="btn btn-primary uploader-btn-browse"><i
                                     class="icon icon-cloud-upload"></i> 选择文件
                         </button>
                     </div>
+
                 </div>
             </section>
         </div>

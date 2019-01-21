@@ -1,17 +1,19 @@
 <script type="text/javascript">
 
-    let company = {
-        id:{{.Id}},
+    let mpv = {
+        id: +{{.Id}},
         operateType: +{{.OperateType}},
         urlApiCompanyGetEditInfo:{{.ApiUriCompanyGetEditInfo}},
         urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
         urlApiCompanyEdit:{{.ApiUriCompanyEdit}},
         urlApiUserGetCheckCode:{{.ApiUriUserGetCheckCode}},
-        urlApiMiniProgramVersionCarouselUpload:{{.ApiUriMiniProgramVersionCarouselUpload}},
+        urlApiMiniProgramVersionUpload:{{.ApiUriMiniProgramVersionUpload}},
         $btnEdit: $('.btn-edit'),
         $type: $('select[name="type"]'),
         $businessCardInfo: $('.business-card-info'),
         $carouselUploader: $('#carouselUploader'),
+        $carouselImgTemplate: $('.carousel-img-template'),
+        $carouselImgList: $('.carousel-img-list'),
         error:{{.Error}},
         init: function () {
             this.render();
@@ -29,8 +31,6 @@
         },
         initHtml: function () {
             let _this = this;
-
-            console.log(_this.$type.val());
             if (_this.error) {
                 _this.$btnEdit.addClass('disabled');
                 layer.popupError(_this.error);
@@ -41,8 +41,10 @@
                 _this.$businessCardInfo.removeClass('hidden')
                 _this.$carouselUploader.uploader({//轮播图上传插件初始化
                     autoUpload: true,            // 当选择文件后立即自动进行上传操作
-                    url: _this.urlApiMiniProgramVersionCarouselUpload,
+                    url: _this.urlApiMiniProgramVersionUpload,
                     chunk_size: 0,
+                    multipart: true,
+                    multipart_params: {id: _this.id, refer_type: 1},
                     headers: {'X-Xsrftoken': $('meta[name=_xsrf]').attr('content')},
                     responseHandler: function (responseObject, file) {
                         _this.$carouselUploader.data('zui.uploader').removeFile(file.id);
@@ -50,8 +52,10 @@
                         console.log(rsp, file);
                         if (!+rsp.error) {
                             layer.popupMsg('上传成功！');
-                            //todo 已上传图片展示到前端
-
+                            let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
+                            $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass(' carousel-img');
+                            $carouselImgTemplate.find('img').attr('src', rsp.info.url).attr("id", rsp.info.resource_id);
+                            $carouselImgTemplate.appendTo(_this.$carouselImgList);
                             return;
                         }
 
@@ -175,6 +179,6 @@
     };
 
     $(function () {
-        company.init();
+        mpv.init();
     });
 </script>

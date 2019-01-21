@@ -24,7 +24,7 @@ func (mpv *MPVersionController) Create() {
 	mpv.Data["OperateType"] = helper.OperateTypeCreate //创建
 	mpv.Data["ApiUriMiniProgramVersionEdit"] = uris.ApiUriMiniProgramVersionEdit
 	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit
-	mpv.Data["ApiUriMiniProgramVersionCarouselUpload"] = uris.ApiUriMiniProgramVersionCarouselUpload
+	mpv.Data["ApiUriMiniProgramVersionUpload"] = uris.ApiUriMiniProgramVersionUpload
 	mpv.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
 	mpv.RenderHtml("小程序版本创建", "mpv", "mini_program_version/edit/html.tpl", "mini_program_version/edit/css.tpl", "mini_program_version/edit/js.tpl", "")
 }

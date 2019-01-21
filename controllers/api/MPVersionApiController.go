@@ -165,21 +165,34 @@ func (mpv *MPVersionApiController) edit(req MPInfoReq) (mpIns models.MiniProgram
 }
 
 /**
-轮播图上传接口
+上传接口
 */
-func (mpv *MPVersionApiController) CarouselUpload() {
+func (mpv *MPVersionApiController) Upload() {
+	req := struct {
+		Id        int64 `form:"id"`
+		ReferType uint8 `form:"refer_type"`
+	}{}
+	if err := mpv.ParseForm(&req); err != nil {
+		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数解析失败！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if req.ReferType != models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel {
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: "无效的上传类型！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
 	f, h, err := mpv.GetFile("file")
 	if err != nil {
-		mpv.ApiReturn(structure.Response{Error: 1, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 
 	resourceId, url, err := Upload(
-		f, h, models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel,
-		0, mpv.GetSession(session.UUID).(int64),
+		f, h, req.ReferType, 0, mpv.GetSession(session.UUID).(int64),
 	)
 	if err != nil {
-		mpv.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 3, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 
