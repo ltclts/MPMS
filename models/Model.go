@@ -33,6 +33,7 @@ const (
 	CompanyTableName            = "company"
 	MiniProgramTableName        = "mini_program"
 	MiniProgramVersionTableName = "mini_program_version"
+	ResourceTableName           = "resource"
 
 	//删除标志
 	UnDeleted = 0

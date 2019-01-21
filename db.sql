@@ -120,3 +120,21 @@ PRIMARY KEY (`id`),
 KEY `idx_mini_program_id` (`mini_program_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小程序版本表';
 
+CREATE TABLE `resource` (
+`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+`refer_type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '存储文件关联类型',
+`refer_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相关id',
+`size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '大小',
+`origin_name` varchar(100) NOT NULL DEFAULT '' COMMENT '原名称',
+`relative_path` varchar(100) NOT NULL DEFAULT '' COMMENT '相对路径',
+`ext` varchar(50) NOT NULL DEFAULT '' COMMENT '扩展名',
+`store_type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '存储类型 0-未知 1-阿里云',
+`sort` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+`is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+`creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+`created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
+`updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
+PRIMARY KEY (`id`),
+KEY `idx_refer_id` (`refer_id`),
+KEY `idx_refer_type` (`refer_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源表';

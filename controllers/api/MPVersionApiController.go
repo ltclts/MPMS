@@ -168,5 +168,20 @@ func (mpv *MPVersionApiController) edit(req MPInfoReq) (mpIns models.MiniProgram
 轮播图上传接口
 */
 func (mpv *MPVersionApiController) CarouselUpload() {
-	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
+	f, h, err := mpv.GetFile("file")
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 1, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	resourceId, url, err := Upload(
+		f, h, models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel,
+		0, mpv.GetSession(session.UUID).(int64),
+	)
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"url": url, "resource_id": resourceId}})
 }
