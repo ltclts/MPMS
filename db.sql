@@ -13,7 +13,7 @@ CREATE TABLE `user` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户表';
 
 CREATE TABLE `config` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -26,7 +26,7 @@ CREATE TABLE `config` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_type` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='配置表';
 
 CREATE TABLE `menu` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -43,7 +43,7 @@ CREATE TABLE `menu` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_type_parent_id` (`type`,`parent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='菜单表';
 
 CREATE TABLE `flow` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -57,7 +57,7 @@ CREATE TABLE `flow` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_refer_id` (`refer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通用流水表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='通用流水表';
 
 CREATE TABLE `relation` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -71,7 +71,7 @@ CREATE TABLE `relation` (
 PRIMARY KEY (`id`),
 KEY `idx_refer_id` (`refer_id`),
 KEY `idx_refer_id_others` (`refer_id_others`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通用关系表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='通用关系表';
 
 CREATE TABLE `company` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -87,7 +87,7 @@ CREATE TABLE `company` (
 PRIMARY KEY (`id`),
 KEY `idx_name` (`name`),
 KEY `idx_short_name` (`short_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='公司表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='公司表';
 
 CREATE TABLE `mini_program` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -102,7 +102,7 @@ CREATE TABLE `mini_program` (
 PRIMARY KEY (`id`),
 KEY `idx_company_id` (`company_id`),
 KEY `idx_appid` (`appid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小程序表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='小程序表';
 
 CREATE TABLE `mini_program_version` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -118,7 +118,7 @@ CREATE TABLE `mini_program_version` (
 `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
 PRIMARY KEY (`id`),
 KEY `idx_mini_program_id` (`mini_program_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小程序版本表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='小程序版本表';
 
 CREATE TABLE `resource` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -137,4 +137,4 @@ CREATE TABLE `resource` (
 PRIMARY KEY (`id`),
 KEY `idx_refer_id` (`refer_id`),
 KEY `idx_refer_type` (`refer_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='资源表';
