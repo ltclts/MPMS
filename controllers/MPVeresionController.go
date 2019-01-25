@@ -21,6 +21,7 @@ func (mpv *MPVersionController) Create() {
 		mpv.Data["Error"] = "参数错误，请退出页面重新进入"
 	}
 
+	mpv.Data["MpId"] = req.MpId
 	mpv.Data["OperateType"] = helper.OperateTypeCreate //创建
 	mpv.Data["ApiUriMiniProgramVersionEdit"] = uris.ApiUriMiniProgramVersionEdit
 	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit
@@ -35,11 +36,11 @@ func (mpv *MPVersionController) Edit() {
 	}{}
 	_ = mpv.ParseForm(&req)
 
-	mpv.Data["MpId"] = req.Id
+	mpv.Data["Id"] = req.Id
 	mpv.Data["OperateType"] = helper.OperateTypeEdit //创建
 	mpv.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit
+	mpv.Data["ApiUriMiniProgramVersionGet"] = uris.ApiUriMiniProgramVersionGet
 	mpv.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
-	mpv.Data["ApiUriMiniProgramList"] = uris.ApiUriMiniProgramList
 	mpv.RenderHtml("小程序版本编辑", "mpv", "mini_program_version/edit/html.tpl", "mini_program_version/edit/css.tpl", "mini_program_version/edit/js.tpl", "")
 }
 

@@ -2,11 +2,9 @@
 
     let mpv = {
         id: +{{.Id}},
+        mpId: +{{.MpId}},
         operateType: +{{.OperateType}},
-        urlApiCompanyGetEditInfo:{{.ApiUriCompanyGetEditInfo}},
-        urlHtmlCompanyEdit:{{.HtmlUriCompanyEdit}},
-        urlApiCompanyEdit:{{.ApiUriCompanyEdit}},
-        urlApiUserGetCheckCode:{{.ApiUriUserGetCheckCode}},
+        urlApiMiniProgramVersionGet:{{.ApiUriMiniProgramVersionGet}},
         urlApiMiniProgramVersionUpload:{{.ApiUriMiniProgramVersionUpload}},
         $btnEdit: $('.btn-edit'),
         $type: $('select[name="type"]'),
@@ -75,7 +73,7 @@
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
                         let $shareImgTemplate = _this.$shareImgTemplate.clone();
-                        $shareImgTemplate.removeClass('hidden').removeClass('share-img-template').addClass('share-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $shareImgTemplate.removeClass('hidden').removeClass('share-img-template').addClass('share-img new').attr('id', rsp.info.resource_id);
                         $shareImgTemplate.find('img').attr('src', rsp.info.url);
                         $shareImgTemplate.appendTo(_this.$shareImgList);
                         _this.currentShareImgCount++;
@@ -103,7 +101,7 @@
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
                         let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
-                        $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass('carousel-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass('carousel-img new').attr('id', rsp.info.resource_id);
                         $carouselImgTemplate.find('img').attr('src', rsp.info.url);
                         $carouselImgTemplate.appendTo(_this.$carouselImgList);
                         _this.currentCarouseImgCount++;
@@ -132,7 +130,7 @@
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
                         let $elegantDemeanorImgTemplate = _this.$elegantDemeanorImgTemplate.clone();
-                        $elegantDemeanorImgTemplate.removeClass('hidden').removeClass('elegant-demeanor-img-template').addClass('elegant-demeanor-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $elegantDemeanorImgTemplate.removeClass('hidden').removeClass('elegant-demeanor-img-template').addClass('elegant-demeanor-img new').attr('id', rsp.info.resource_id);
                         $elegantDemeanorImgTemplate.find('img').attr('src', rsp.info.url);
                         $elegantDemeanorImgTemplate.appendTo(_this.$elegantDemeanorImgList);
                         _this.currentElegantDemeanorImgCount++;
@@ -175,7 +173,7 @@
         initHtmlInfo: function () {
             let _this = this;
             layer.ajax({
-                url: _this.urlApiCompanyGetEditInfo,
+                url: _this.urlApiMiniProgramVersionGet,
                 type: 'get',
                 data: {
                     id: _this.id

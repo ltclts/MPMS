@@ -15,6 +15,78 @@ type MPVersionApiController struct {
 	Controller
 }
 
+func (mpv *MPVersionApiController) Get() {
+	req := struct {
+		Id int64 `form:"id"`
+	}{}
+	if err := mpv.ParseForm(&req); err != nil {
+		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	where := structure.StringToObjectMap{"mpv.`is_deleted`": models.UnDeleted, "c.`is_deleted`": models.UnDeleted, "mpv.`id`": req.Id}
+	//用户只能看到本公司的
+	if mpv.GetSession(session.UserType).(uint8) == models.UserTypeCustomer {
+		company, err := mpv.getSessionCompanyInfo()
+		if err != nil {
+			mpv.ApiReturn(structure.Response{Error: 2, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
+			return
+		}
+		where["c.id"] = company.Id
+	}
+
+	version := models.MiniProgramVersion{}
+	list, err := version.GetList(where)
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 3, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if len(list) == 0 {
+		mpv.ApiReturn(structure.Response{Error: 4, Msg: "没有获取到该版本信息", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	info := list[0]
+	resource := models.Resource{}
+	fields := []string{"id", "relative_path", "sort", "store_type"}
+	whereResource := structure.StringToObjectMap{"is_deleted": models.UnDeleted, "refer_id": info.Id}
+
+	whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionSharedImg
+	shareImgList, err := resource.Select(fields, whereResource)
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel
+	carouselImgList, err := resource.Select(fields, whereResource)
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionBusinessCardElegantDemeanor
+	elegantDemeanorImgList, err := resource.Select(fields, whereResource)
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	for _, itemList := range [][]models.Resource{shareImgList, carouselImgList, elegantDemeanorImgList} {
+		for index, item := range itemList {
+			itemList[index].RelativePath = item.GetRealPath()
+		}
+	}
+
+	mpv.ApiReturn(structure.Response{Error: 0, Msg: "", Info: structure.StringToObjectMap{
+		"item":                   info,
+		"shareImgList":           shareImgList,
+		"carouselImgList":        carouselImgList,
+		"elegantDemeanorImgList": elegantDemeanorImgList,
+	}})
+}
+
 func (mpv *MPVersionApiController) List() {
 	req := struct {
 		Id            int64 `form:"id"`

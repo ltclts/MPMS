@@ -2,6 +2,8 @@ package models
 
 import (
 	"MPMS/structure"
+	"fmt"
+	"github.com/astaxie/beego"
 )
 
 type Resource struct {
@@ -25,8 +27,17 @@ const (
 	ResourceStoreTypeAliYunOss = 1
 )
 
+func (r *Resource) GetRealPath() string {
+
+	if r.StoreType == ResourceStoreTypeAliYunOss {
+		return fmt.Sprintf(beego.AppConfig.String("oss.pathurl")+"%s", r.RelativePath)
+	}
+
+	return ""
+}
+
 func (r *Resource) Select(fields []string, where structure.StringToObjectMap) ([]Resource, error) {
-	rows, fieldsAddr, err := r.quickQueryWithExtra(fields, r.getFieldsMap, where, UserTableName, "order by sort asc")
+	rows, fieldsAddr, err := r.quickQueryWithExtra(fields, r.getFieldsMap, where, ResourceTableName, "order by sort asc")
 	if err != nil {
 		return nil, err
 	}

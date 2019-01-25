@@ -35,7 +35,7 @@
                     return;
                 }
 
-                location.href = _this.urlHtmlMiniProgramVersionEdit + ("?mini_program_version_id=" + _this.checkedItem.id);
+                location.href = _this.urlHtmlMiniProgramVersionEdit + ("?mini_program_version_id=" + _this.checkedItem.Id);
             });
         },
         renderHtml: function () {
