@@ -169,16 +169,23 @@ func (mpv *MPVersionApiController) edit(req MPInfoReq) (mpIns models.MiniProgram
 */
 func (mpv *MPVersionApiController) Upload() {
 	req := struct {
-		Id        int64 `form:"id"`
-		ReferType uint8 `form:"refer_type"`
+		Id           int64 `form:"id"`
+		ReferType    uint8 `form:"refer_type"`
+		CurrentCount int64 `form:"current_count"`
 	}{}
 	if err := mpv.ParseForm(&req); err != nil {
 		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数解析失败！", Info: structure.StringToObjectMap{}})
 		return
 	}
 
-	if req.ReferType != models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel {
-		mpv.ApiReturn(structure.Response{Error: 2, Msg: "无效的上传类型！", Info: structure.StringToObjectMap{}})
+	typeToAllowedCountMap := structure.Uint8ToInt64{
+		models.ResourceReferTypeMiniProgramVersionSharedImg:                   1,
+		models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel:        4,
+		models.ResourceReferTypeMiniProgramVersionBusinessCardElegantDemeanor: 4,
+	}
+
+	if allowedCount := typeToAllowedCountMap[req.ReferType]; allowedCount == 0 || allowedCount <= req.CurrentCount {
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: fmt.Sprintf("当前数量已上传%d张，无法再上传！", req.CurrentCount), Info: structure.StringToObjectMap{}})
 		return
 	}
 

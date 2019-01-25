@@ -17,8 +17,10 @@ type Resource struct {
 }
 
 const (
-	//小程序 名片展示 轮播图
-	ResourceReferTypeMiniProgramVersionBusinessCardCarousel = 1
+	//分享图片 轮播图 风采图
+	ResourceReferTypeMiniProgramVersionSharedImg                   = 1
+	ResourceReferTypeMiniProgramVersionBusinessCardCarousel        = 2
+	ResourceReferTypeMiniProgramVersionBusinessCardElegantDemeanor = 3
 
 	ResourceStoreTypeAliYunOss = 1
 )

@@ -42,6 +42,7 @@
 <script src="/static/components/zui/lib/chosen/chosen.min.js"></script>
 <script src="/static/components/zui/lib/datetimepicker/datetimepicker.min.js"></script>
 <script src="/static/components/zui/lib/uploader/zui.uploader.min.js"></script>
+<script src="/static/components/zui/lib/sortable/zui.sortable.min.js"></script>
 <script src="/static/js/index.js"></script>
 {{.Scripts}}
 </body>

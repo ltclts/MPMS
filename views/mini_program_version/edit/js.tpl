@@ -13,8 +13,18 @@
         $businessCardInfo: $('.business-card-info'),
         $carouselUploader: $('#carouselUploader'),
         $carouselImgTemplate: $('.carousel-img-template'),
-        $carouselImgList: $('.carousel-img-list'),
+        $carouselImgList: $('#carouselImgList'),
+        $shareUploader: $('#shareUploader'),
+        $shareImgTemplate: $('.share-img-template'),
+        $shareImgList: $('#shareImgList'),
+        $elegantDemeanorUploader: $('#elegantDemeanorUploader'),
+        $elegantDemeanorImgTemplate: $('.elegant-demeanor-img-template'),
+        $elegantDemeanorImgList: $('#elegantDemeanorImgList'),
+        currentElegantDemeanorImgCount: 0,
+        currentShareImgCount: 0,
+        currentCarouseImgCount: 0,
         error:{{.Error}},
+        notDeal: true,
         init: function () {
             this.render();
         },
@@ -27,7 +37,113 @@
             $('body').on('click', '.btn-edit', function () {
                 _this.$btnEdit.addClass("disabled");
                 _this.edit();
+            }).on('click', '.del-flag', function () {
+                let $this = $(this), $parent = $this.parent();
+                layer.dangerConfirm('确认删除？', function (index) {
+                    $parent.addClass('hidden del');
+                    layer.popupMsg("删除成功！");
+                    layer.close(index);
+
+                    if ($parent.hasClass('carousel-img')) {
+                        _this.currentCarouseImgCount--;
+                    } else if ($parent.hasClass('share-img')) {
+                        _this.currentShareImgCount--;
+                    } else if ($parent.hasClass('elegant-demeanor-img')) {
+                        _this.currentElegantDemeanorImgCount--;
+                    }
+                    console.log(_this.currentShareImgCount);
+                });
             });
+        },
+        renderUploader: function () {
+            let _this = this, token = $('meta[name=_xsrf]').attr('content');
+
+            //分享图
+            _this.$shareUploader.uploader({//分享图上传插件初始化
+                autoUpload: true,            // 当选择文件后立即自动进行上传操作
+                url: _this.urlApiMiniProgramVersionUpload,
+                chunk_size: 0,
+                multipart: true,
+                multipart_params: function (file, params) {
+                    return {id: _this.id, refer_type: 1, current_count: _this.currentShareImgCount};
+                },
+                headers: {'X-Xsrftoken': token},
+                responseHandler: function (responseObject, file) {
+                    _this.$shareUploader.data('zui.uploader').removeFile(file.id);
+                    let rsp = JSON.parse(responseObject.response);
+                    console.log(rsp, file);
+                    if (!+rsp.error) {
+                        layer.popupMsg('上传成功！');
+                        let $shareImgTemplate = _this.$shareImgTemplate.clone();
+                        $shareImgTemplate.removeClass('hidden').removeClass('share-img-template').addClass('share-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $shareImgTemplate.find('img').attr('src', rsp.info.url);
+                        $shareImgTemplate.appendTo(_this.$shareImgList);
+                        _this.currentShareImgCount++;
+                        return;
+                    }
+
+                    layer.popupError('上传失败：' + rsp.msg);
+                }
+            });
+
+            //轮播图
+            _this.$carouselUploader.uploader({//轮播图上传插件初始化
+                autoUpload: true,            // 当选择文件后立即自动进行上传操作
+                url: _this.urlApiMiniProgramVersionUpload,
+                chunk_size: 0,
+                multipart: true,
+                multipart_params: function (file, params) {
+                    return {id: _this.id, refer_type: 2, current_count: _this.currentShareImgCount};
+                },
+                headers: {'X-Xsrftoken': token},
+                responseHandler: function (responseObject, file) {
+                    _this.$carouselUploader.data('zui.uploader').removeFile(file.id);
+                    let rsp = JSON.parse(responseObject.response);
+                    console.log(rsp, file);
+                    if (!+rsp.error) {
+                        layer.popupMsg('上传成功！');
+                        let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
+                        $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass('carousel-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $carouselImgTemplate.find('img').attr('src', rsp.info.url);
+                        $carouselImgTemplate.appendTo(_this.$carouselImgList);
+                        _this.currentCarouseImgCount++;
+                        return;
+                    }
+
+                    layer.popupError('上传失败：' + rsp.msg);
+                }
+            });
+            _this.$carouselImgList.sortable();
+
+            //风采图
+            _this.$elegantDemeanorUploader.uploader({//风采图上传插件初始化
+                autoUpload: true,            // 当选择文件后立即自动进行上传操作
+                url: _this.urlApiMiniProgramVersionUpload,
+                chunk_size: 0,
+                multipart: true,
+                multipart_params: function (file, params) {
+                    return {id: _this.id, refer_type: 3, current_count: _this.currentShareImgCount};
+                },
+                headers: {'X-Xsrftoken': token},
+                responseHandler: function (responseObject, file) {
+                    _this.$elegantDemeanorUploader.data('zui.uploader').removeFile(file.id);
+                    let rsp = JSON.parse(responseObject.response);
+                    console.log(rsp, file);
+                    if (!+rsp.error) {
+                        layer.popupMsg('上传成功！');
+                        let $elegantDemeanorImgTemplate = _this.$elegantDemeanorImgTemplate.clone();
+                        $elegantDemeanorImgTemplate.removeClass('hidden').removeClass('elegant-demeanor-img-template').addClass('elegant-demeanor-img').addClass('new').attr('id', rsp.info.resource_id);
+                        $elegantDemeanorImgTemplate.find('img').attr('src', rsp.info.url);
+                        $elegantDemeanorImgTemplate.appendTo(_this.$elegantDemeanorImgList);
+                        _this.currentElegantDemeanorImgCount++;
+                        return;
+                    }
+
+                    layer.popupError('上传失败：' + rsp.msg);
+                }
+            });
+            _this.$elegantDemeanorImgList.sortable();
+
         },
         initHtml: function () {
             let _this = this;
@@ -38,31 +154,8 @@
             }
 
             if (1 === +_this.$type.val()) {
-                _this.$businessCardInfo.removeClass('hidden')
-                _this.$carouselUploader.uploader({//轮播图上传插件初始化
-                    autoUpload: true,            // 当选择文件后立即自动进行上传操作
-                    url: _this.urlApiMiniProgramVersionUpload,
-                    chunk_size: 0,
-                    multipart: true,
-                    multipart_params: {id: _this.id, refer_type: 1},
-                    headers: {'X-Xsrftoken': $('meta[name=_xsrf]').attr('content')},
-                    responseHandler: function (responseObject, file) {
-                        _this.$carouselUploader.data('zui.uploader').removeFile(file.id);
-                        let rsp = JSON.parse(responseObject.response);
-                        console.log(rsp, file);
-                        if (!+rsp.error) {
-                            layer.popupMsg('上传成功！');
-                            let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
-                            $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass(' carousel-img');
-                            $carouselImgTemplate.find('img').attr('src', rsp.info.url).attr("id", rsp.info.resource_id);
-                            $carouselImgTemplate.appendTo(_this.$carouselImgList);
-                            return;
-                        }
-
-                        layer.popupError('上传失败：' + rsp.msg);
-                    }
-                });
-
+                _this.$businessCardInfo.removeClass('hidden');
+                _this.renderUploader();
 
             }
 

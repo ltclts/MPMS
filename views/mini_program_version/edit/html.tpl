@@ -3,7 +3,7 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
-        <div class="list common-content">
+        <div class="list common-content col-sm-12 col-xs-12">
             <header class="col-sm-offset-1">
                 <h2>类型选择</h2>
             </header>
@@ -19,31 +19,78 @@
                 </div>
             </section>
         </div>
-        <div class="list common-content business-card-info hidden">
+        <div class="list common-content col-sm-12 col-xs-12 share-info">
             <header class="col-sm-offset-1">
-                <h2>名片信息设置</h2>
+                <h2>分享设置</h2>
             </header>
-            <section class="items mt-10">
-                <div>
-                    <header class="col-sm-offset-2">
-                        <h3>轮播图上传（最多可上传4张）</h3>
-                    </header>
-                    <div class="carousel-img-list col-sm-6 col-xs-12 col-sm-offset-3">
-                        <div class="col-sm-3 col-xs-3 carousel-img-template hidden">
-                            <img src="" id="">
-                        </div>
-                    </div>
-                    <div id="carouselUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader mt-10">
-                        <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
-                        <button type="button" class="btn btn-primary uploader-btn-browse"><i
-                                    class="icon icon-cloud-upload"></i> 选择文件
-                        </button>
-                    </div>
+            <section class="items col-sm-12 col-xs-12 mt-10">
+                <header class="col-sm-offset-2">
+                    <h3>分享图上传</h3>
+                </header>
+                <div class="col-sm-6 col-xs-12 share-img-template hidden" id="">
+                    <p class="del-flag">删除</p>
+                    <img src="#">
+                </div>
+                <div class="share-img-list list-group col-sm-6 col-xs-12 col-sm-offset-3 mt-10" id="shareImgList">
 
+                </div>
+                <div id="shareUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader">
+                    <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
+                    <button type="button" class="btn btn-primary uploader-btn-browse"><i
+                                class="icon icon-cloud-upload"></i> 选择文件
+                    </button>
+                </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn"><button class="btn btn-default"
+                                                          type="button">分享寄语</button></span>
+                    <input type="text" class="form-control" name="share-words" placeholder="分享寄语" maxlength="50">
                 </div>
             </section>
         </div>
-        <div class="list common-content">
+        <div class="list common-content col-sm-12 col-xs-12 business-card-info hidden">
+            <header class="col-sm-offset-1">
+                <h2>名片信息设置</h2>
+            </header>
+            <section class="items col-sm-12 col-xs-12 mt-10">
+                <header class="col-sm-offset-2">
+                    <h3>轮播图上传（最多可上传4张）</h3>
+                </header>
+                <div class="col-sm-6 col-xs-6 carousel-img-template hidden" id="">
+                    <p class="del-flag">删除</p>
+                    <img src="#">
+                </div>
+                <div class="carousel-img-list list-group col-sm-6 col-xs-12 col-sm-offset-3 mt-10"
+                     id="carouselImgList"
+                     title="拖动可进行排序">
+                </div>
+                <div id="carouselUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader">
+                    <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
+                    <button type="button" class="btn btn-primary uploader-btn-browse"><i
+                                class="icon icon-cloud-upload"></i> 选择文件
+                    </button>
+                </div>
+            </section>
+            <section class="items col-sm-12 col-xs-12 mt-10">
+                <header class="col-sm-offset-2">
+                    <h3>风采图上传（最多可上传4张）</h3>
+                </header>
+                <div class="col-sm-12 col-xs-12 elegant-demeanor-img-template hidden" id="">
+                    <p class="del-flag">删除</p>
+                    <img src="#">
+                </div>
+                <div class="elegant-demeanor-img-list list-group col-sm-6 col-xs-12 col-sm-offset-3 mt-10"
+                     id="elegantDemeanorImgList"
+                     title="拖动可进行排序">
+                </div>
+                <div id="elegantDemeanorUploader" class="col-sm-6 col-xs-12 col-sm-offset-3 uploader">
+                    <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
+                    <button type="button" class="btn btn-primary uploader-btn-browse"><i
+                                class="icon icon-cloud-upload"></i> 选择文件
+                    </button>
+                </div>
+            </section>
+        </div>
+        <div class="list common-content col-sm-12 col-xs-12">
             <div class="input-group btn-group col-sm-6 col-xs-12  col-sm-offset-1">
                 <a class="btn btn-info btn-edit" title="创建">
                     <i class="icon icon-plus"></i>创建
