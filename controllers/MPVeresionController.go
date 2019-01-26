@@ -40,6 +40,7 @@ func (mpv *MPVersionController) Edit() {
 	mpv.Data["OperateType"] = helper.OperateTypeEdit //创建
 	mpv.Data["ApiUriMiniProgramEdit"] = uris.ApiUriMiniProgramEdit
 	mpv.Data["ApiUriMiniProgramVersionGet"] = uris.ApiUriMiniProgramVersionGet
+	mpv.Data["ApiUriMiniProgramVersionUpload"] = uris.ApiUriMiniProgramVersionUpload
 	mpv.Data["MiniProgramVersionTypeToNameMap"] = models.MiniProgramVersionTypeToNameMap()
 	mpv.RenderHtml("小程序版本编辑", "mpv", "mini_program_version/edit/html.tpl", "mini_program_version/edit/css.tpl", "mini_program_version/edit/js.tpl", "")
 }

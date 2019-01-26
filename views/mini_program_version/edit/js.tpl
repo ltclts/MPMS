@@ -72,11 +72,7 @@
                     console.log(rsp, file);
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
-                        let $shareImgTemplate = _this.$shareImgTemplate.clone();
-                        $shareImgTemplate.removeClass('hidden').removeClass('share-img-template').addClass('share-img new').attr('id', rsp.info.resource_id);
-                        $shareImgTemplate.find('img').attr('src', rsp.info.url);
-                        $shareImgTemplate.appendTo(_this.$shareImgList);
-                        _this.currentShareImgCount++;
+                        _this.renderShareImg(rsp.info.resource_id, rsp.info.url);
                         return;
                     }
 
@@ -100,11 +96,7 @@
                     console.log(rsp, file);
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
-                        let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
-                        $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass('carousel-img new').attr('id', rsp.info.resource_id);
-                        $carouselImgTemplate.find('img').attr('src', rsp.info.url);
-                        $carouselImgTemplate.appendTo(_this.$carouselImgList);
-                        _this.currentCarouseImgCount++;
+                        _this.renderCarouselImg(rsp.info.resource_id, rsp.info.url);
                         return;
                     }
 
@@ -129,11 +121,7 @@
                     console.log(rsp, file);
                     if (!+rsp.error) {
                         layer.popupMsg('上传成功！');
-                        let $elegantDemeanorImgTemplate = _this.$elegantDemeanorImgTemplate.clone();
-                        $elegantDemeanorImgTemplate.removeClass('hidden').removeClass('elegant-demeanor-img-template').addClass('elegant-demeanor-img new').attr('id', rsp.info.resource_id);
-                        $elegantDemeanorImgTemplate.find('img').attr('src', rsp.info.url);
-                        $elegantDemeanorImgTemplate.appendTo(_this.$elegantDemeanorImgList);
-                        _this.currentElegantDemeanorImgCount++;
+                        _this.renderElegantDemeanorImg(rsp.info.resource_id, rsp.info.url);
                         return;
                     }
 
@@ -142,6 +130,31 @@
             });
             _this.$elegantDemeanorImgList.sortable();
 
+        },
+        renderShareImg: function (id, src) {
+            let _this = this;
+
+            let $shareImgTemplate = _this.$shareImgTemplate.clone();
+            $shareImgTemplate.removeClass('hidden').removeClass('share-img-template').addClass('share-img new').attr('id', id);
+            $shareImgTemplate.find('img').attr('src', src);
+            $shareImgTemplate.appendTo(_this.$shareImgList);
+            _this.currentShareImgCount++;
+        },
+        renderCarouselImg: function (id, src) {
+            let _this = this;
+            let $carouselImgTemplate = _this.$carouselImgTemplate.clone();
+            $carouselImgTemplate.removeClass('hidden').removeClass('carousel-img-template').addClass('carousel-img new').attr('id', id);
+            $carouselImgTemplate.find('img').attr('src', src);
+            $carouselImgTemplate.appendTo(_this.$carouselImgList);
+            _this.currentCarouseImgCount++;
+        },
+        renderElegantDemeanorImg: function (id, src) {
+            let _this = this;
+            let $elegantDemeanorImgTemplate = _this.$elegantDemeanorImgTemplate.clone();
+            $elegantDemeanorImgTemplate.removeClass('hidden').removeClass('elegant-demeanor-img-template').addClass('elegant-demeanor-img new').attr('id', id);
+            $elegantDemeanorImgTemplate.find('img').attr('src', src);
+            $elegantDemeanorImgTemplate.appendTo(_this.$elegantDemeanorImgList);
+            _this.currentElegantDemeanorImgCount++;
         },
         initHtml: function () {
             let _this = this;
@@ -185,19 +198,20 @@
                     return false;
                 }
 
-                //下划线转大驼峰
-                if (resp.info.company_info) {
-                    $.each(_this.companyFieldToInputNameMap, function (k, v) {
-                        $('input[name="' + v + '"]').val(resp.info.company_info[k.toLargeHump()]);
-                    })
-                }
+                let carouselImgList = resp.info.CarouselImgList || [];
+                carouselImgList.forEach(function (v) {
+                    _this.renderCarouselImg(v.Id, v.Path);
+                });
 
-                if (resp.info.user_info) {
-                    $.each(_this.userFieldToInputNameMap, function (k, v) {
-                        $('input[name="' + v + '"]').val(resp.info.user_info[k.toLargeHump()]);
-                    });
-                    _this.email = resp.info.user_info['Email'];
-                }
+                let shareImgList = resp.info.ShareImgList || [];
+                shareImgList.forEach(function (v) {
+                    _this.renderShareImg(v.Id, v.Path);
+                });
+
+                let elegantDemeanorImgList = resp.info.ElegantDemeanorImgList || [];
+                elegantDemeanorImgList.forEach(function (v) {
+                    _this.renderElegantDemeanorImg(v.Id, v.Path);
+                });
 
             });
         },

@@ -16,9 +16,11 @@ type MPVersionApiController struct {
 }
 
 func (mpv *MPVersionApiController) Get() {
+
 	req := struct {
 		Id int64 `form:"id"`
 	}{}
+
 	if err := mpv.ParseForm(&req); err != nil {
 		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
 		return
@@ -48,6 +50,7 @@ func (mpv *MPVersionApiController) Get() {
 	}
 
 	info := list[0]
+	info.StatusName, _ = models.GetMiniProgramVersionStatusNameByStatus(info.Status)
 	resource := models.Resource{}
 	fields := []string{"id", "relative_path", "sort", "store_type"}
 	whereResource := structure.StringToObjectMap{"is_deleted": models.UnDeleted, "refer_id": info.Id}
@@ -73,18 +76,19 @@ func (mpv *MPVersionApiController) Get() {
 		return
 	}
 
-	for _, itemList := range [][]models.Resource{shareImgList, carouselImgList, elegantDemeanorImgList} {
-		for index, item := range itemList {
-			itemList[index].RelativePath = item.GetRealPath()
+	rspInfo := structure.StringToObjectMap{"Version": info}
+	for indexList, itemList := range map[string][]models.Resource{"ShareImgList": shareImgList, "CarouselImgList": carouselImgList, "ElegantDemeanorImgList": elegantDemeanorImgList} {
+		var itemCopy = structure.StringToObjectMap{}
+		var itemCopyList []structure.StringToObjectMap
+		for _, item := range itemList {
+			itemCopy["Id"] = item.Id
+			itemCopy["Path"] = item.GetRealPath()
+			itemCopyList = append(itemCopyList, itemCopy)
 		}
+		rspInfo[indexList] = itemCopyList
 	}
 
-	mpv.ApiReturn(structure.Response{Error: 0, Msg: "", Info: structure.StringToObjectMap{
-		"item":                   info,
-		"shareImgList":           shareImgList,
-		"carouselImgList":        carouselImgList,
-		"elegantDemeanorImgList": elegantDemeanorImgList,
-	}})
+	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: rspInfo})
 }
 
 func (mpv *MPVersionApiController) List() {
