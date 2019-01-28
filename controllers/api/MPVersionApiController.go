@@ -78,9 +78,9 @@ func (mpv *MPVersionApiController) Get() {
 
 	rspInfo := structure.StringToObjectMap{"Version": info}
 	for indexList, itemList := range map[string][]models.Resource{"ShareImgList": shareImgList, "CarouselImgList": carouselImgList, "ElegantDemeanorImgList": elegantDemeanorImgList} {
-		var itemCopy = structure.StringToObjectMap{}
 		var itemCopyList []structure.StringToObjectMap
 		for _, item := range itemList {
+			var itemCopy = structure.StringToObjectMap{}
 			itemCopy["Id"] = item.Id
 			itemCopy["Path"] = item.GetRealPath()
 			itemCopyList = append(itemCopyList, itemCopy)
@@ -139,105 +139,228 @@ func (mpv *MPVersionApiController) List() {
 	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"list": list}})
 }
 
+type ShareInfo struct {
+	ShareWords   string `form:"share_info[share_words]"`
+	ImgToAddList []int  `form:"share_info[img_to_add][]"` //slice 只支持int 和string 两种类型 参数获取
+	ImgToDelList []int  `form:"share_info[img_to_del][]"`
+}
+
+type CarouselInfo struct {
+	ImgToAddList  []int `form:"param[carousel_info][img_to_add][]"`
+	ImgToDelList  []int `form:"param[carousel_info][img_to_del][]"`
+	ImgToSortList []int `form:"param[carousel_info][img_to_sort][]"`
+}
+
+type ElegantDemeanorInfo struct {
+	ImgToAddList  []int `form:"param[elegant_demeanor_info][img_to_add][]"`
+	ImgToDelList  []int `form:"param[elegant_demeanor_info][img_to_del][]"`
+	ImgToSortList []int `form:"param[elegant_demeanor_info][img_to_sort][]"`
+}
+
+type MpVersionEditReq struct {
+	Id          int64 `form:"id"`
+	MpId        int64 `form:"mp_id"`
+	OperateType int   `form:"operate_type"`
+	Type        int   `form:"type"`
+	ShareInfo
+
+	//名片展示
+	CarouselInfo
+	ElegantDemeanorInfo
+}
+
 func (mpv *MPVersionApiController) Edit() {
-	req := struct {
-		OperateType int8 `form:"operate_type"`
-		MPInfoReq
-	}{}
+	//todo 增加编辑限制
+
+	req := MpVersionEditReq{}
 	if err := mpv.ParseForm(&req); err != nil {
 		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数解析失败！", Info: structure.StringToObjectMap{}})
 		return
 	}
 
-	if helper.OperateTypeCreate == req.OperateType { //创建
-		mpIns, err := mpv.create(req.MPInfoReq)
+	if req.Type == models.MiniProgramVersionBusinessCard {
+		mpvIns, err := mpv.businessCardEdit(req)
 		if err != nil {
 			mpv.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
-		mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"id": mpIns.Id}})
-	} else if helper.OperateTypeEdit == req.OperateType {
-		_, err := mpv.edit(req.MPInfoReq)
-		if err != nil {
-			mpv.ApiReturn(structure.Response{Error: 3, Msg: err.Error(), Info: structure.StringToObjectMap{}})
-			return
-		}
-		mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"id": mpvIns.Id}})
+		return
 	} else {
-		mpv.ApiReturn(structure.Response{Error: 4, Msg: "参数错误，请刷新重试", Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 3, Msg: "参数错误，请刷新重试", Info: structure.StringToObjectMap{}})
+		return
 	}
-
 }
 
-func (mpv *MPVersionApiController) create(req MPInfoReq) (mpIns models.MiniProgram, err error) {
+func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIns models.MiniProgramVersion, err error) {
+	fmt.Println(req)
+	shareInfo := req.ShareInfo
+	carouselInfo := req.CarouselInfo
+	elegantDemeanorInfo := req.ElegantDemeanorInfo
 	creatorId := mpv.GetSession(session.UUID).(int64)
-	_, err = mpIns.StartTrans()
+
+	_, err = mpvIns.StartTrans()
 	if err != nil {
-		return mpIns, err
+		return mpvIns, err
+	}
+	var operateType uint8
+	operateInfo := structure.StringToObjectMap{}
+	if req.OperateType == helper.OperateTypeCreate { //创建
+		if req.MpId == 0 {
+			_ = mpvIns.Rollback()
+			return mpvIns, helper.CreateNewError("参数错误，请刷新重试！")
+		}
+
+		toInsert := structure.StringToObjectMap{
+			"mini_program_id": req.MpId,
+			"type":            req.Type,
+			"status":          models.MiniProgramVersionStatusApproved,
+			"creator_id":      creatorId,
+			"share_words":     shareInfo.ShareWords,
+			"is_deleted":      models.UnDeleted,
+		}
+		mpvId, err := mpvIns.Insert(toInsert)
+		if err != nil {
+			_ = mpvIns.Rollback()
+			return mpvIns, err
+		}
+		req.Id = mpvId
+		operateInfo = toInsert
+		operateType = models.FlowStatusCreate
+	} else if req.OperateType == helper.OperateTypeEdit { //更新
+		if req.Id == 0 {
+			_ = mpvIns.Rollback()
+			return mpvIns, helper.CreateNewError("参数错误，请刷新重试！")
+		}
+		toUpdate := structure.StringToObjectMap{
+			"share_words": shareInfo.ShareWords,
+		}
+		where := structure.StringToObjectMap{"id": req.Id}
+		updateCount, err := mpvIns.Update(toUpdate, where)
+		if err != nil {
+			_ = mpvIns.Rollback()
+			return mpvIns, err
+		}
+		if updateCount == 0 {
+			_ = mpvIns.Rollback()
+			return mpvIns, helper.CreateNewError("更新版本失败，请重试！")
+		}
+		operateInfo["toUpdate"] = toUpdate
+		operateInfo["where"] = where
+		operateType = models.FlowStatusEdit
+	} else {
+		_ = mpvIns.Rollback()
+		return mpvIns, helper.CreateNewError("未知操作类型，请刷新重试！")
 	}
 
-	_, err = mpIns.SelectOne([]string{"id"}, structure.StringToObjectMap{"appid": req.Appid, "is_deleted": models.UnDeleted})
-	if err != nil {
-		_ = mpIns.Rollback()
-		return mpIns, err
-	}
-	if mpIns.Id != 0 {
-		_ = mpIns.Rollback()
-		return mpIns, helper.CreateNewError("该appid已存在！")
-	}
-
-	toInsert := structure.StringToObjectMap{
-		"name":       req.Name,
-		"remark":     req.Remark,
-		"appid":      req.Appid,
-		"creator_id": creatorId,
-		"company_id": req.CompanyId,
-	}
-	//创建
-	mpId, err := mpIns.Insert(toInsert)
-	if err != nil {
-		_ = mpIns.Rollback()
-		return mpIns, err
-	}
-	mpIns.Id = mpId
-	//写入流水
 	flow := models.Flow{}
-	_, err = flow.Insert(mpIns.Id, models.FlowReferTypeMinProgram, models.FlowStatusCreate, creatorId, toInsert)
+	_, err = flow.Insert(req.Id, models.FlowReferTypeMinProgramVersion, operateType, creatorId, operateInfo)
 	if err != nil {
-		_ = mpIns.Rollback()
-		return mpIns, err
-	}
-	err = mpIns.Commit()
-	return mpIns, err
-}
-
-func (mpv *MPVersionApiController) edit(req MPInfoReq) (mpIns models.MiniProgram, err error) {
-	operatorId := mpv.GetSession(session.UUID).(int64)
-	_, err = mpIns.StartTrans()
-	if err != nil {
-		return mpIns, err
+		_ = mpvIns.Rollback()
+		return mpvIns, err
 	}
 
-	toUpdate := structure.StringToObjectMap{
-		"name":   req.Name,
-		"remark": req.Remark,
-	}
-	//编辑
-	mpId, err := mpIns.Update(toUpdate, structure.StringToObjectMap{"id": req.Id})
+	mpvIns, err = mpvIns.SelectOne([]string{}, structure.StringToObjectMap{"id": req.Id})
 	if err != nil {
-		_ = mpIns.Rollback()
-		return mpIns, err
+		_ = mpvIns.Rollback()
+		return mpvIns, err
 	}
-	mpIns.Id = mpId
-	//写入流水
-	flow := models.Flow{}
-	_, err = flow.Insert(mpIns.Id, models.FlowReferTypeMinProgram, models.FlowStatusEdit, operatorId, toUpdate)
-	if err != nil {
-		_ = mpIns.Rollback()
-		return mpIns, err
+
+	resource := models.Resource{}
+	toUpdate := structure.StringToObjectMap{}
+	where := structure.StringToObjectMap{}
+
+	//删除
+	imgToDelListAll := [][]int{shareInfo.ImgToDelList, carouselInfo.ImgToDelList, elegantDemeanorInfo.ImgToDelList}
+	for _, imgToDelList := range imgToDelListAll {
+		for _, imgId := range imgToDelList {
+			where["id"] = imgId
+			toUpdate["is_deleted"] = models.Deleted
+			updateCount, err := resource.Update(toUpdate, where)
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+			if updateCount == 0 {
+				_ = mpvIns.Rollback()
+				return mpvIns, helper.CreateNewError("图片删除失败，请重试！")
+			}
+			_, err = flow.Insert(
+				int64(imgId),
+				models.FlowReferTypeResource,
+				models.FlowStatusDelete,
+				creatorId,
+				structure.StringToObjectMap{
+					"toUpdate": toUpdate, "where": where,
+				})
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+		}
 	}
-	err = mpIns.Commit()
-	return mpIns, err
+
+	//添加
+	toUpdate = structure.StringToObjectMap{}
+	where = structure.StringToObjectMap{}
+	imgToAddListAll := [][]int{shareInfo.ImgToAddList, carouselInfo.ImgToAddList, elegantDemeanorInfo.ImgToAddList}
+	for _, imgToAddList := range imgToAddListAll {
+		for _, imgId := range imgToAddList {
+			where["id"] = imgId
+			toUpdate["refer_id"] = mpvIns.Id
+			updateCount, err := resource.Update(toUpdate, where)
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+			if updateCount == 0 {
+				_ = mpvIns.Rollback()
+				return mpvIns, helper.CreateNewError("图片保存失败，请重试！")
+			}
+			_, err = flow.Insert(
+				int64(imgId),
+				models.FlowReferTypeResource,
+				models.FlowStatusEdit,
+				creatorId,
+				structure.StringToObjectMap{
+					"toUpdate": toUpdate, "where": where,
+				})
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+		}
+	}
+
+	//排序
+	toUpdate = structure.StringToObjectMap{}
+	where = structure.StringToObjectMap{}
+	imgToSortListAll := [][]int{carouselInfo.ImgToSortList, elegantDemeanorInfo.ImgToSortList}
+	for _, imgToSortList := range imgToSortListAll {
+		for index, imgId := range imgToSortList {
+			where["id"] = imgId
+			toUpdate["sort"] = index
+			_, err := resource.Update(toUpdate, where)
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+			_, err = flow.Insert(
+				int64(imgId),
+				models.FlowReferTypeResource,
+				models.FlowStatusEdit,
+				creatorId,
+				structure.StringToObjectMap{
+					"toUpdate": toUpdate, "where": where,
+				})
+			if err != nil {
+				_ = mpvIns.Rollback()
+				return mpvIns, err
+			}
+		}
+	}
+
+	return mpvIns, mpvIns.Commit()
 }
 
 /**
@@ -254,14 +377,14 @@ func (mpv *MPVersionApiController) Upload() {
 		return
 	}
 
-	typeToAllowedCountMap := structure.Uint8ToInt64{
+	typeToAllowedCountMap := structure.Uint8ToInt64{ //todo 写入配置
 		models.ResourceReferTypeMiniProgramVersionSharedImg:                   1,
 		models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel:        4,
 		models.ResourceReferTypeMiniProgramVersionBusinessCardElegantDemeanor: 4,
 	}
 
 	if allowedCount := typeToAllowedCountMap[req.ReferType]; allowedCount == 0 || allowedCount <= req.CurrentCount {
-		mpv.ApiReturn(structure.Response{Error: 2, Msg: fmt.Sprintf("当前数量已上传%d张，无法再上传！", req.CurrentCount), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: fmt.Sprintf("当前已上传%d张，无法继续上传！", req.CurrentCount), Info: structure.StringToObjectMap{}})
 		return
 	}
 

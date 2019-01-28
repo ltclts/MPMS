@@ -21,9 +21,11 @@ const (
 	FlowReferTypeCompany           = 2 //公司相关
 	FlowReferTypeContactUser       = 3 //联系人相关
 	FlowReferTypeMinProgramVersion = 4 //小程序版本管理
+	FlowReferTypeResource          = 5 //小程序版本管理
 
 	FlowStatusCreate = 1 //创建
 	FlowStatusEdit   = 2 //编辑
+	FlowStatusDelete = 3 //删除
 
 )
 

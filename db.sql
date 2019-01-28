@@ -1,3 +1,6 @@
+SET innodb_lock_wait_timeout = 500;
+show variables like 'innodb_lock_wait_timeout';
+
 CREATE TABLE `user` (
 `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
 `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名称',
@@ -111,6 +114,7 @@ CREATE TABLE `mini_program_version` (
 `content` text NOT NULL DEFAULT '' COMMENT '内容',
 `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '小程序类型 0-未知 1-名片展示',
 `remark` varchar(100) NOT NULL DEFAULT '' COMMENT '备注',
+`share_words` varchar(100) NOT NULL DEFAULT '' COMMENT '分享寄语',
 `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0-编辑中 1-审核中 2-已审核 3-已上线 4-已下线',
 `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
 `creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
