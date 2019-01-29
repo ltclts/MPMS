@@ -51,6 +51,33 @@
             <header class="col-sm-offset-1">
                 <h2>名片信息设置</h2>
             </header>
+            <section class="items col-sm-12 col-xs-12 mt-10" id="business_card_content">
+                <header class="col-sm-offset-2">
+                    <h3>主体信息</h3>
+                </header>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn"><button class="btn btn-default"
+                                                          type="button">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称</button></span>
+                    <input type="text" class="form-control" name="name" placeholder="主题名称"
+                           maxlength="50">
+                </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn"><button class="btn btn-default"
+                                                          type="button">标&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;签</button></span>
+                    <input type="text" class="form-control" name="flag" placeholder="标签" maxlength="30">
+                </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn"><button class="btn btn-default"
+                                                          type="button">电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话</button></span>
+                    <input type="tel" class="form-control" name="tel" placeholder="联系电话" maxlength="50">
+                </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn"><button class="btn btn-default"
+                                                          type="button">地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</button></span>
+                    <input type="text" class="form-control" name="address" placeholder="联系地址"
+                           maxlength="100">
+                </div>
+            </section>
             <section class="items col-sm-12 col-xs-12 mt-10">
                 <header class="col-sm-offset-2">
                     <h3>轮播图上传（最多可上传4张）</h3>

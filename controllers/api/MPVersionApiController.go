@@ -135,7 +135,6 @@ func (mpv *MPVersionApiController) List() {
 		statusName, _ := models.GetMiniProgramVersionStatusNameByStatus(item.Status)
 		list[index].StatusName = statusName
 	}
-	fmt.Println(list)
 	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"list": list}})
 }
 
@@ -157,6 +156,13 @@ type ElegantDemeanorInfo struct {
 	ImgToSortList []int `form:"param[elegant_demeanor_info][img_to_sort][]"`
 }
 
+type VersionContentInfo struct {
+	Name    string `form:"param[content][name]"`
+	Flag    string `form:"param[content][flag]"`
+	Tel     string `form:"param[content][tel]"`
+	Address string `form:"param[content][address]"`
+}
+
 type MpVersionEditReq struct {
 	Id          int64 `form:"id"`
 	MpId        int64 `form:"mp_id"`
@@ -167,11 +173,10 @@ type MpVersionEditReq struct {
 	//名片展示
 	CarouselInfo
 	ElegantDemeanorInfo
+	VersionContentInfo
 }
 
 func (mpv *MPVersionApiController) Edit() {
-	//todo 增加编辑限制
-
 	req := MpVersionEditReq{}
 	if err := mpv.ParseForm(&req); err != nil {
 		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数解析失败！", Info: structure.StringToObjectMap{}})
@@ -217,7 +222,13 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 			"status":          models.MiniProgramVersionStatusApproved,
 			"creator_id":      creatorId,
 			"share_words":     shareInfo.ShareWords,
-			"is_deleted":      models.UnDeleted,
+			"content": structure.StringToObjectMap{
+				"name":    req.VersionContentInfo.Name,
+				"flag":    req.VersionContentInfo.Flag,
+				"address": req.VersionContentInfo.Address,
+				"tel":     req.VersionContentInfo.Tel,
+			},
+			"is_deleted": models.UnDeleted,
 		}
 		mpvId, err := mpvIns.Insert(toInsert)
 		if err != nil {
@@ -234,6 +245,12 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 		}
 		toUpdate := structure.StringToObjectMap{
 			"share_words": shareInfo.ShareWords,
+			"content": structure.StringToObjectMap{
+				"name":    req.VersionContentInfo.Name,
+				"flag":    req.VersionContentInfo.Flag,
+				"address": req.VersionContentInfo.Address,
+				"tel":     req.VersionContentInfo.Tel,
+			},
 		}
 		where := structure.StringToObjectMap{"id": req.Id}
 		updateCount, err := mpvIns.Update(toUpdate, where)

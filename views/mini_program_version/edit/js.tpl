@@ -183,7 +183,6 @@
             if (1 === +_this.$type.val()) {
                 _this.$businessCardInfo.removeClass('hidden');
                 _this.renderUploader();
-
             }
 
             if (1 === _this.operateType) {
@@ -233,11 +232,25 @@
                 _this.mpId = item.MpId || 0;
                 _this.id = item.Id || 0;
                 _this.$shareWords.val(item.ShareWords || "");
+                let content = JSON.parse(item.Content);
+                console.log(content);
+                _this.contentFields.forEach(function (name) {
+                    $('input[name="' + name + '"]').val(content[name]);
+                });
             });
         },
+        contentFields: ['name', 'flag', 'tel', 'address'],
         getBusinessCardEditInfo: function () {
             let _this = this;
-            return {'carousel_info': _this.getCarouselInfo(), 'elegant_demeanor_info': _this.getElegantDemeanorInfo()};
+            let content = {};
+            _this.contentFields.forEach(function (name) {
+                content[name] = $('input[name="' + name + '"]').val();
+            });
+            return {
+                'carousel_info': _this.getCarouselInfo(),
+                'elegant_demeanor_info': _this.getElegantDemeanorInfo(),
+                'content': content
+            };
         },
         getShareInfo: function () {
             //共有属性获取
@@ -295,6 +308,42 @@
             });
             return {'img_to_sort': imgToSort, 'img_to_add': imgToAdd, 'img_to_del': imgToDel};
         },
+        clearImg: function () {
+            let _this = this;
+            _this.$shareImgList.find('.share-img').each(function () {
+                let $this = $(this);
+                if ($this.hasClass('del')) {
+                    $this.remove();
+                    return true;
+                }
+
+                if ($this.hasClass('new')) {
+                    $this.removeClass('new');
+                }
+            });
+            _this.$carouselImgList.find('.carousel-img').each(function () {
+                let $this = $(this);
+                if ($this.hasClass('del')) {
+                    $this.remove();
+                    return true;
+                }
+
+                if ($this.hasClass('new')) {
+                    $this.removeClass('new');
+                }
+            });
+            _this.$elegantDemeanorImgList.find('.elegant-demeanor-img').each(function () {
+                let $this = $(this);
+                if ($this.hasClass('del')) {
+                    $this.remove();
+                    return true;
+                }
+
+                if ($this.hasClass('new')) {
+                    $this.removeClass('new');
+                }
+            });
+        },
         edit: function () {
             let _this = this,
                 type = +_this.$type.val(),
@@ -344,9 +393,7 @@
                 } else {
                     layer.popupMsg("编辑成功！");
                     _this.$btnEdit.removeClass("disabled");
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
+                    _this.clearImg();
                     return true;
                 }
             });
