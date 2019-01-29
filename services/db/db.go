@@ -111,7 +111,8 @@ func initDB() (db *sql.DB, err error) {
 /**
 开启事务
 */
-func StartTrans() (tx *sql.Tx, err error) {
+func StartTrans() (*sql.Tx, error) {
+	var tx *sql.Tx
 	con, err := connect()
 	if err != nil {
 		return tx, err
@@ -121,7 +122,7 @@ func StartTrans() (tx *sql.Tx, err error) {
 		return con.tx, err
 	}
 
-	if tx, err := con.db.Begin(); err != nil {
+	if tx, err = con.db.Begin(); err != nil {
 		return tx, err
 	}
 	con.useTrans = true

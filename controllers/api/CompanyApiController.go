@@ -155,17 +155,18 @@ func (c *CompanyApiController) Edit() {
 }
 
 func (c *CompanyApiController) checkRegisterCode(checkCode string) error {
-	checkCodeStored := c.GetSession(session.UserRegisterCheckCode).(string)
-	if checkCodeStored == "" {
-		return helper.CreateNewError("验证码已过期，请重新获取！")
+
+	if checkCodeStored := c.GetSession(session.UserRegisterCheckCode); checkCodeStored != nil {
+		checkCodeStored := checkCodeStored.(string)
+		if checkCode != checkCodeStored {
+			return helper.CreateNewError("验证码不正确！")
+		}
+
+		c.DelSession(session.UserRegisterCheckCode)
+		return nil
 	}
 
-	if checkCode != checkCodeStored {
-		return helper.CreateNewError("验证码不正确！")
-	}
-
-	c.DelSession(session.UserRegisterCheckCode)
-	return nil
+	return helper.CreateNewError("请获取验证码")
 }
 
 func (c *CompanyApiController) update(companyInfo CompanyInfo, userInfo UserInfo) (company models.Company, err error) {
