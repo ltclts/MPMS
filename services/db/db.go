@@ -44,13 +44,6 @@ func connect() (con *Con, err error) {
 				continue
 			}
 
-			if err = con.test(); err != nil {
-				_ = con.db.Close() //关闭连接
-				ConCount--
-				log.Info("测试失败", con, err)
-				continue
-			}
-
 			con.lastLiveTime = time.Now()
 			UerToConMap[unique] = con
 			return con, nil
@@ -81,7 +74,7 @@ func connect() (con *Con, err error) {
 }
 
 //测试连通
-func (con *Con) test() error {
+func (con *Con) Test() error {
 	_, err := con.db.Query("select 1")
 	if err != nil {
 		return err
