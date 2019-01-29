@@ -2,12 +2,11 @@ package models
 
 import (
 	"MPMS/helper"
+	"MPMS/services/db"
 	"MPMS/structure"
 	"database/sql"
 	"fmt"
-	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
-	"runtime/debug"
 	"strings"
 )
 
@@ -40,89 +39,31 @@ const (
 	Deleted   = 1
 )
 
-var db *sql.DB
-var tx *sql.Tx        //事务使用
-var userTrans = false //是否开启事务
-
-/**
-连接数据库（使用单例模式）
-*/
-func (b *Model) initDB() (*sql.DB, error) {
-	var err error
-	if db != nil {
-		return db, err
-	}
-	fmt.Println("init -- db")
-	db, err = sql.Open(beego.AppConfig.String("DBDriverName"), beego.AppConfig.String("DBDataSourceName"))
-	if err != nil {
-		return db, err
-	}
-	return db, err
-}
-
 /**
 开启事务
 */
 func (b *Model) StartTrans() (*sql.Tx, error) {
-	var err error
-	if db == nil {
-		db, err = b.initDB()
-		if err != nil {
-			return nil, err
-		}
-	}
-	if tx, err = db.Begin(); err == nil {
-		userTrans = true
-	}
-
-	return tx, err
+	return db.StartTrans()
 }
 
 /**
 事务回滚
 */
 func (b *Model) Rollback() error {
-	err := tx.Rollback()
-	if err == nil {
-		userTrans = false
-	}
-	return err
+	return db.Rollback()
 }
 
 /**
 事务回滚
 */
 func (b *Model) Commit() error {
-	err := tx.Commit()
-	if err == nil {
-		userTrans = false
-	}
-	return err
+	return db.Commit()
 }
 
 /**
 查询方法
 */
 func (b *Model) query(sql string, args ...interface{}) (rows *sql.Rows, err error) {
-
-	defer func() {
-		if r := recover(); r != nil {
-			err = helper.CreateNewError(fmt.Sprintf("%s", r))
-			debug.PrintStack()
-		}
-	}()
-
-	if db == nil {
-		if _, err := b.initDB(); err != nil {
-			return rows, err
-		}
-	}
-
-	if userTrans {
-		smt, _ := tx.Prepare(sql)
-		return smt.Query(args...)
-	}
-
 	return db.Query(sql, args...)
 }
 
@@ -130,25 +71,6 @@ func (b *Model) query(sql string, args ...interface{}) (rows *sql.Rows, err erro
 执行方法
 */
 func (b *Model) exec(sql string, args ...interface{}) (result sql.Result, err error) {
-
-	defer func() {
-		if r := recover(); r != nil {
-			err = helper.CreateNewError(fmt.Sprintf("%s", r))
-			debug.PrintStack()
-		}
-	}()
-
-	if db == nil {
-		if _, err := b.initDB(); err != nil {
-			return result, err
-		}
-	}
-
-	if userTrans {
-		smt, _ := tx.Prepare(sql)
-		return smt.Exec(args...)
-	}
-
 	return db.Exec(sql, args...)
 }
 

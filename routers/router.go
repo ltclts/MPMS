@@ -21,7 +21,7 @@ func init() {
 	/**
 	中间件
 	*/
-	beego.InsertFilter("/*", beego.BeforeRouter, filters.FilterUser)
+	beego.InsertFilter("/*", beego.BeforeRouter, filters.Before)
 
 	/**
 	路由设定

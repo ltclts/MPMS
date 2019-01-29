@@ -6,11 +6,12 @@ import (
 	"MPMS/session"
 	"fmt"
 	"github.com/astaxie/beego/context"
+	"github.com/petermattis/goid"
 	"strings"
 )
 
-func FilterUser(ctx *context.Context) {
-	log.Info("access", *ctx.Request)
+func Before(ctx *context.Context) {
+	log.Info("Access", goid.Get(), *ctx.Request)
 
 	isLogin := false
 	if uuid := ctx.Input.Session(session.UUID); uuid != nil {
