@@ -4,7 +4,6 @@ import (
 	"MPMS/routers/uris"
 	"MPMS/services/log"
 	"MPMS/session"
-	"fmt"
 	"github.com/astaxie/beego/context"
 	"github.com/petermattis/goid"
 	"strings"
@@ -20,7 +19,6 @@ func Before(ctx *context.Context) {
 
 	uri := ctx.Request.RequestURI
 	can := func(uri string) bool {
-		fmt.Println(uri)
 		//特殊路由 可以不需要登录
 		exceptUris := uris.GetUnCheckLoginUris()
 		for _, exceptUri := range exceptUris {

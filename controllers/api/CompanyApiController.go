@@ -109,7 +109,7 @@ func (c *CompanyApiController) Edit() {
 		c.ApiReturn(structure.Response{Error: 1, Msg: "参数获取失败，请重试！", Info: structure.StringToObjectMap{}})
 		return
 	}
-	fmt.Println(req)
+
 	if helper.OperateTypeCreate == req.OperateType { //创建
 		if err := c.checkRegisterCode(req.UserInfo.CheckCode); err != nil {
 			c.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})

@@ -198,7 +198,6 @@ func (mpv *MPVersionApiController) Edit() {
 }
 
 func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIns models.MiniProgramVersion, err error) {
-	fmt.Println(req)
 	shareInfo := req.ShareInfo
 	carouselInfo := req.CarouselInfo
 	elegantDemeanorInfo := req.ElegantDemeanorInfo

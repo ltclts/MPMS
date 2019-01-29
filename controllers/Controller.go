@@ -7,7 +7,6 @@ import (
 	"MPMS/session"
 	"MPMS/structure"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -43,7 +42,6 @@ func (b *Controller) RenderHtml(title string, pageName string, tplName string, h
 	b.getMenuList()
 	b.Layout = "layout.tpl"
 	b.LayoutSections = map[string]string{"HtmlCss": htmlCssName, "Scripts": scriptsName, "Sidebar": sidebarName}
-	fmt.Println(b.Data)
 }
 
 type dashBoard struct {

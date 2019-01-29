@@ -77,7 +77,7 @@ func (u *User) CreateContactUser(companyId int64, creatorId int64) (int64, error
 	if err != nil {
 		return userId, err
 	}
-	fmt.Println(fmt.Sprintf("user=%d password=%s", userId, password))
+
 	relation := Relation{}
 	_, err = relation.Insert(RelationReferTypeCompanyContactUser, companyId, userId, creatorId)
 	if err != nil {

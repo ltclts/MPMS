@@ -2,7 +2,6 @@ package api
 
 import (
 	"MPMS/structure"
-	"fmt"
 )
 
 /**
@@ -23,13 +22,11 @@ func (mp *MPOutApiController) PageConfigRequest() {
 	}{}
 
 	if err := mp.ParseJsonData(&req); err != nil {
-		fmt.Println("请求：", req)
 		mp.ApiReturn(structure.Response{Error: 1, Msg: "没有获取到请求参数！", Info: structure.StringToObjectMap{}})
 		return
 	}
 
 	if req.Appid == "" {
-		fmt.Println("请求：", req)
 		mp.ApiReturn(structure.Response{Error: 1, Msg: "没有获取到appid！", Info: structure.StringToObjectMap{}})
 		return
 	}
