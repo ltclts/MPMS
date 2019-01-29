@@ -13,13 +13,15 @@ import (
 
 const (
 	MaxConCount = 300 //最大连接数
-	WaitTimeOut = 300 //超时时间
+	WaitTimeOut = 300 //超时时间 todo 在开始位置读取数据库超时时间
 )
 
 var ConCount = 0 //当前DB连接数
 
 var UerToConMap map[int64]*Con
-var ConPool []*Con
+
+//当队列用
+var ConPools = make(chan *Con, MaxConCount)
 
 type Con struct {
 	db           *sql.DB //数据库连接
@@ -35,19 +37,18 @@ func connect() (con *Con, err error) {
 		return con, nil
 	} else {
 		//判断连接是否超时
-		for len(ConPool) > 0 {
-			con, ConPool = ConPool[len(ConPool)-1], ConPool[:len(ConPool)-1]
-			//超时则关闭连接
-			if time.Now().Sub(con.lastLiveTime).Seconds() > WaitTimeOut {
-				_ = con.db.Close() //关闭连接
-				ConCount--
-				continue
+		for len(ConPools) > 0 {
+			if con = <-ConPools; con != nil {
+				if time.Now().Sub(con.lastLiveTime).Seconds() > WaitTimeOut {
+					_ = con.db.Close() //关闭连接
+					ConCount--
+					continue
+				}
+
+				con.lastLiveTime = time.Now()
+				UerToConMap[unique] = con
+				return con, nil
 			}
-
-			con.lastLiveTime = time.Now()
-			UerToConMap[unique] = con
-			return con, nil
-
 		}
 
 		if ConCount > MaxConCount {
@@ -90,7 +91,7 @@ func release() error {
 	}
 
 	delete(UerToConMap, goid.Get())
-	ConPool = append(ConPool, con)
+	ConPools <- con
 	return nil
 }
 
