@@ -12,13 +12,16 @@ import (
 )
 
 const (
-	MaxConCount = 300 //最大连接数
-	WaitTimeOut = 300 //超时时间 todo 在开始位置读取数据库超时时间
+	TestSql                = `select 1`
+	QueryMaxCountSql       = `show variables like 'max_connections'`
+	QueryMaxWaitTimeOutSql = `show variables like 'wait_timeout'`
 )
 
 var ConCount = 0 //当前DB连接数
-
 var UerToConMap map[int64]*Con
+
+var MaxConCount = 200   //默认最大连接数
+var MaxWaitTimeOut = 30 //超时时间
 
 //当队列用
 var ConPools = make(chan *Con, MaxConCount)
@@ -30,6 +33,84 @@ type Con struct {
 	lastLiveTime time.Time
 }
 
+func InitConPools() {
+	_ = QueryMaxCount()
+	_ = QueryMaxWaitTimeOut()
+
+	//初始化 1/10 - 当前已连接数的连接
+	initCount := MaxConCount/10 - ConCount
+	for i := 0; i < initCount; i++ {
+		con, err := initCon()
+		if err != nil {
+			log.Err("初始化数据库连接失败", err.Error())
+			return
+		}
+		ConPools <- con
+	}
+	log.Info("数据库连接初始化结束", ConCount, MaxConCount, MaxWaitTimeOut, len(ConPools), cap(ConPools))
+}
+
+//测试连通
+func (con *Con) Test() error {
+	_, err := con.db.Query(TestSql)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func QueryMaxCount() error {
+	rows, err := Query(QueryMaxCountSql)
+	if err != nil {
+		log.Err("获取数据库最大连接数失败", err.Error(), QueryMaxCountSql)
+		return err
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	var name string
+	var val int
+	for rows.Next() {
+		err = rows.Scan(&name, &val)
+		if err != nil {
+			log.Err("读取数据库最大连接数失败", err.Error(), QueryMaxCountSql)
+			return err
+		}
+	}
+
+	MaxConCount = val / 2
+
+	//重新创建连接池
+	conPoolsCopy := make(chan *Con, MaxConCount)
+	for len(ConPools) > 0 {
+		con := <-ConPools
+		conPoolsCopy <- con
+	}
+	ConPools = conPoolsCopy
+	return nil
+}
+
+func QueryMaxWaitTimeOut() error {
+	rows, err := Query(QueryMaxWaitTimeOutSql)
+	if err != nil {
+		log.Err("获取数据库最大超时时间失败", err.Error(), QueryMaxWaitTimeOutSql)
+		return err
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+	var name string
+	for rows.Next() {
+		err = rows.Scan(&name, &MaxWaitTimeOut)
+		if err != nil {
+			log.Err("读取数据库最大超时时间失败", err.Error(), QueryMaxWaitTimeOutSql)
+			return err
+		}
+	}
+	return nil
+}
+
 func connect() (con *Con, err error) {
 	unique := goid.Get()
 	if con = UerToConMap[unique]; con != nil {
@@ -39,7 +120,7 @@ func connect() (con *Con, err error) {
 		//判断连接是否超时
 		for len(ConPools) > 0 {
 			if con = <-ConPools; con != nil {
-				if time.Now().Sub(con.lastLiveTime).Seconds() > WaitTimeOut {
+				if int(time.Now().Sub(con.lastLiveTime).Seconds()) > MaxWaitTimeOut {
 					_ = con.db.Close() //关闭连接
 					ConCount--
 					continue
@@ -56,16 +137,11 @@ func connect() (con *Con, err error) {
 			return con, helper.CreateNewError("max connections")
 		}
 
-		ConCount++
-		db, err := initDB()
+		con, err = initCon()
 		if err != nil {
-			ConCount--
 			return con, err
 		}
-		con = new(Con)
-		con.db = db
-		con.lastLiveTime = time.Now()
-		con.useTrans = false
+
 		if UerToConMap == nil {
 			UerToConMap = map[int64]*Con{}
 		}
@@ -74,22 +150,33 @@ func connect() (con *Con, err error) {
 	}
 }
 
-//测试连通
-func (con *Con) Test() error {
-	_, err := con.db.Query("select 1")
+func initCon() (con *Con, err error) {
+	ConCount++
+	db, err := initDB()
 	if err != nil {
-		return err
+		ConCount--
+		return con, err
 	}
-	return nil
+	con = new(Con)
+	con.db = db
+	con.lastLiveTime = time.Now()
+	con.useTrans = false
+	return con, nil
 }
 
 //释放
-func release() error {
+func Release() error {
 	con, err := connect()
 	if err != nil {
 		return err
 	}
 
+	delete(UerToConMap, goid.Get())
+	ConPools <- con
+	return nil
+}
+
+func (con *Con) release() error {
 	delete(UerToConMap, goid.Get())
 	ConPools <- con
 	return nil
@@ -148,7 +235,7 @@ func Rollback() error {
 	if err == nil {
 		con.useTrans = false
 		con.tx = nil
-		_ = release() //释放占用
+		_ = con.release() //释放占用
 	}
 
 	return err
@@ -168,7 +255,7 @@ func Commit() error {
 		if err == nil {
 			con.useTrans = false
 			con.tx = nil
-			_ = release() //释放占用
+			_ = con.release() //释放占用
 		}
 	}
 
@@ -197,7 +284,7 @@ func Query(sql string, args ...interface{}) (rows *sql.Rows, err error) {
 		return smt.Query(args...)
 	}
 	rows, err = con.db.Query(sql, args...)
-	_ = release()
+	_ = con.release()
 	return rows, err
 }
 
@@ -223,6 +310,6 @@ func Exec(sql string, args ...interface{}) (result sql.Result, err error) {
 	}
 
 	result, err = con.db.Exec(sql, args...)
-	_ = release()
+	_ = con.release()
 	return result, err
 }
