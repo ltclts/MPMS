@@ -8,8 +8,8 @@ import (
 )
 
 func init() {
-	//数据库初始化连接池
-	go db.InitConPools()
+	//数据库配置
+	go db.InitConfig()
 	//处理脚本 写在最前面
 	go email.Listen()
 }

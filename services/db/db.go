@@ -20,8 +20,8 @@ const (
 var ConCount = 0 //当前DB连接数
 var UerToConMap map[int64]*Con
 
-var MaxConCount = 200   //默认最大连接数
-var MaxWaitTimeOut = 30 //超时时间
+var MaxConCount = 200    //默认最大连接数
+var MaxWaitTimeOut = 300 //超时时间
 
 //当队列用
 var ConPools = make(chan *Con, MaxConCount)
@@ -33,21 +33,10 @@ type Con struct {
 	lastLiveTime time.Time
 }
 
-func InitConPools() {
+func InitConfig() {
 	_ = QueryMaxCount()
 	_ = QueryMaxWaitTimeOut()
-
-	//初始化 1/10 - 当前已连接数的连接
-	initCount := MaxConCount/10 - ConCount
-	for i := 0; i < initCount; i++ {
-		con, err := initCon()
-		if err != nil {
-			log.Err("初始化数据库连接失败", err.Error())
-			return
-		}
-		ConPools <- con
-	}
-	log.Info("数据库连接初始化结束", ConCount, MaxConCount, MaxWaitTimeOut, len(ConPools), cap(ConPools))
+	log.Info("数据库配置初始化结束", ConCount, MaxConCount, MaxWaitTimeOut)
 }
 
 //测试连通
