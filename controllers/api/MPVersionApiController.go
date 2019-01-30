@@ -161,6 +161,8 @@ type VersionContentInfo struct {
 	Flag    string `form:"param[content][flag]"`
 	Tel     string `form:"param[content][tel]"`
 	Address string `form:"param[content][address]"`
+	Lng     string `form:"param[content][lng]"`
+	Lat     string `form:"param[content][lat]"`
 }
 
 type MpVersionEditReq struct {
@@ -226,6 +228,8 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 				"flag":    req.VersionContentInfo.Flag,
 				"address": req.VersionContentInfo.Address,
 				"tel":     req.VersionContentInfo.Tel,
+				"lng":     req.VersionContentInfo.Lng,
+				"lat":     req.VersionContentInfo.Lat,
 			},
 			"is_deleted": models.UnDeleted,
 		}
@@ -249,6 +253,8 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 				"flag":    req.VersionContentInfo.Flag,
 				"address": req.VersionContentInfo.Address,
 				"tel":     req.VersionContentInfo.Tel,
+				"lng":     req.VersionContentInfo.Lng,
+				"lat":     req.VersionContentInfo.Lat,
 			},
 		}
 		where := structure.StringToObjectMap{"id": req.Id}

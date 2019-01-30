@@ -7,6 +7,7 @@ import (
 	"MPMS/session"
 	"MPMS/structure"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -32,6 +33,7 @@ func (b *Controller) RenderHtml(title string, pageName string, tplName string, h
 	b.Data["CurrentPageName"] = pageName
 	b.Data["xsrfdata"] = b.XSRFToken()
 	b.Data["ApiUriLogout"] = uris.ApiUriUserLogout
+	b.Data["MapScriptSrc"] = fmt.Sprintf(`http://api.map.baidu.com/api?v=3.0&ak=%s`, beego.AppConfig.String("map.key"))
 	company, err := b.getSessionCompanyInfo()
 	if err != nil {
 		b.Data["CompanyName"] = "两分钱"

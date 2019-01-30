@@ -64,7 +64,7 @@
             _this.$datagrid.datagrid({
                 dataSource: {
                     cols: [
-                        {name: 'Code', label: '版本号'},
+                        {name: 'CreatedAt', label: '创建时间'},
                         {name: 'StatusName', label: '状态'},
                         {name: 'MpName', label: '小程序'},
                         {name: 'CShortName', label: '所属'},

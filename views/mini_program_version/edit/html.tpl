@@ -80,6 +80,16 @@
             </section>
             <section class="items col-sm-12 col-xs-12 mt-10">
                 <header class="col-sm-offset-2">
+                    <h3>地图选点</h3>
+                </header>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <div id="map_container"></div>
+                    <input type="text" class="form-control hidden" name="lng" placeholder="">
+                    <input type="text" class="form-control hidden" name="lat" placeholder="">
+                </div>
+            </section>
+            <section class="items col-sm-12 col-xs-12 mt-10">
+                <header class="col-sm-offset-2">
                     <h3>轮播图上传（最多可上传4张）</h3>
                 </header>
                 <div class="col-sm-6 col-xs-6 carousel-img-template hidden" id="">

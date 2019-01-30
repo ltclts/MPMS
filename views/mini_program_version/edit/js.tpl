@@ -1,5 +1,5 @@
+<script charset="utf-8" src="{{.MapScriptSrc}}"></script>
 <script type="text/javascript">
-
     let mpv = {
         id: +{{.Id}},
         mpId: +{{.MpId}},
@@ -21,12 +21,16 @@
         $elegantDemeanorUploader: $('#elegantDemeanorUploader'),
         $elegantDemeanorImgTemplate: $('.elegant-demeanor-img-template'),
         $elegantDemeanorImgList: $('#elegantDemeanorImgList'),
+        $lng: $('input[name="lng"]'),
+        $lat: $('input[name="lat"]'),
         token: $('meta[name=_xsrf]').attr('content'),
         currentElegantDemeanorImgCount: 0,
         currentShareImgCount: 0,
         currentCarouseImgCount: 0,
         error:{{.Error}},
         notDeal: true,
+        map: null,
+        contentFields: ['name', 'flag', 'tel', 'address', 'lng', 'lat'],
         init: function () {
             this.render();
         },
@@ -56,6 +60,35 @@
                     console.log(_this.currentShareImgCount);
                 });
             });
+        },
+        renderMap: function () {
+            let _this = this;
+            _this.map = new BMap.Map('map_container');
+            let opts = {type: BMAP_NAVIGATION_CONTROL_SMALL,anchor: BMAP_ANCHOR_TOP_RIGHT};
+            _this.map.addControl(new BMap.NavigationControl(opts));
+            _this.map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+            _this.map.setZoom(15);
+            _this.mapTo(116.404, 39.915);
+            _this.map.addEventListener('click', function (e) {
+                _this.mapTo(e.point.lng, e.point.lat);
+            });
+        },
+        mapTo: function (lng, lat) {
+            console.log(lng, lat);
+            let _this = this;
+            //获取地图上所有的覆盖物
+            let allOverlay = _this.map.getOverlays();
+            for (let i = 0; i < allOverlay.length; i++) {
+                _this.map.removeOverlay(allOverlay[i]);
+            }
+
+            let point = new BMap.Point(lng, lat);  // 创建点坐标
+            _this.map.centerAndZoom(point, _this.map.getZoom());
+            let marker = new BMap.Marker(point);        // 创建标注
+            _this.map.addOverlay(marker); // 将标注添加到地图中
+
+            _this.$lng.val(lng);
+            _this.$lat.val(lat);
         },
         renderUploader: function () {
             let _this = this, token = _this.token;
@@ -183,6 +216,7 @@
             if (1 === +_this.$type.val()) {
                 _this.$businessCardInfo.removeClass('hidden');
                 _this.renderUploader();
+                _this.renderMap();
             }
 
             if (1 === _this.operateType) {
@@ -233,13 +267,13 @@
                 _this.id = item.Id || 0;
                 _this.$shareWords.val(item.ShareWords || "");
                 let content = JSON.parse(item.Content);
+                _this.mapTo(content.lng, content.lat);
                 console.log(content);
                 _this.contentFields.forEach(function (name) {
                     $('input[name="' + name + '"]').val(content[name]);
                 });
             });
         },
-        contentFields: ['name', 'flag', 'tel', 'address'],
         getBusinessCardEditInfo: function () {
             let _this = this;
             let content = {};

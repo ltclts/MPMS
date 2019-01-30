@@ -96,6 +96,7 @@ type MpvWithRelatedInfo struct {
 	ShareWords string
 	Content    string
 	Status     uint8
+	CreatedAt  string
 	StatusName string
 	MpId       int64
 	MpName     string
@@ -104,7 +105,7 @@ type MpvWithRelatedInfo struct {
 }
 
 func (mpv *MiniProgramVersion) GetList(where structure.StringToObjectMap) (list []MpvWithRelatedInfo, err error) {
-	fields := "mpv.`id`,mpv.`code`,mpv.`share_words`,mpv.`content`,mpv.`status`,mp.id AS mp_id,mp.`name` AS mp_name,c.short_name AS c_short_name,c.id AS c_id"
+	fields := "mpv.`id`,mpv.`code`,mpv.`share_words`,mpv.`content`,mpv.`status`,mpv.`created_at`,mp.id AS mp_id,mp.`name` AS mp_name,c.short_name AS c_short_name,c.id AS c_id"
 	sql := "SELECT %s FROM mini_program_version mpv JOIN mini_program mp ON mpv.mini_program_id = mp.id JOIN company c ON mp.company_id = c.id WHERE %s %s"
 	whereStr, whereValues := mpv.renderWhereDirectly(where)
 	query := fmt.Sprintf(sql, fields, whereStr, "order by mpv.`id` desc")
@@ -119,7 +120,7 @@ func (mpv *MiniProgramVersion) GetList(where structure.StringToObjectMap) (list 
 
 	for rows.Next() {
 		item := MpvWithRelatedInfo{}
-		err = rows.Scan(&item.Id, &item.Code, &item.ShareWords, &item.Content, &item.Status, &item.MpId, &item.MpName, &item.CShortName, &item.CId)
+		err = rows.Scan(&item.Id, &item.Code, &item.ShareWords, &item.Content, &item.Status, &item.CreatedAt, &item.MpId, &item.MpName, &item.CShortName, &item.CId)
 		if err != nil {
 			return nil, err
 		}
