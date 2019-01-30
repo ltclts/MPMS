@@ -64,16 +64,16 @@
         renderMap: function () {
             let _this = this;
             _this.map = new BMap.Map('map_container');
-            let opts = {type: BMAP_NAVIGATION_CONTROL_SMALL,anchor: BMAP_ANCHOR_TOP_RIGHT};
+            let opts = {type: BMAP_NAVIGATION_CONTROL_SMALL, anchor: BMAP_ANCHOR_TOP_RIGHT};
             _this.map.addControl(new BMap.NavigationControl(opts));
             _this.map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
             _this.map.setZoom(15);
-            _this.mapTo(116.404, 39.915);
+            _this.mapTo(116.404, 39.915, true);
             _this.map.addEventListener('click', function (e) {
-                _this.mapTo(e.point.lng, e.point.lat);
+                _this.mapTo(e.point.lng, e.point.lat, false);
             });
         },
-        mapTo: function (lng, lat) {
+        mapTo: function (lng, lat, move) {
             console.log(lng, lat);
             let _this = this;
             //获取地图上所有的覆盖物
@@ -83,7 +83,9 @@
             }
 
             let point = new BMap.Point(lng, lat);  // 创建点坐标
-            _this.map.centerAndZoom(point, _this.map.getZoom());
+            if (move) {
+                _this.map.centerAndZoom(point, _this.map.getZoom());
+            }
             let marker = new BMap.Marker(point);        // 创建标注
             _this.map.addOverlay(marker); // 将标注添加到地图中
 
@@ -267,7 +269,7 @@
                 _this.id = item.Id || 0;
                 _this.$shareWords.val(item.ShareWords || "");
                 let content = JSON.parse(item.Content);
-                _this.mapTo(content.lng, content.lat);
+                _this.mapTo(content.lng, content.lat, true);
                 console.log(content);
                 _this.contentFields.forEach(function (name) {
                     $('input[name="' + name + '"]').val(content[name]);
