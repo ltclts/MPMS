@@ -65,7 +65,9 @@ func init() {
 	/**
 	外部调用接口
 	*/
-	Routes = append(Routes, Route{uris.ApiUriMpOutPageConfigRequest, &api.MPOutApiController{}, "post:PageConfigRequest"})
+	Routes = append(Routes, Route{uris.ApiUriMpOutInfoGet, &api.MPOutApiController{}, "post:RequestInfo"})
+
+	Routes = append(Routes, Route{uris.ApiUriHelperRefreshDBConPools, &api.HelperApiController{}, "get:RefreshDBConPools"})
 
 	for _, route := range Routes {
 		beego.Router(route.Uri, route.ControllerInterface, route.Method)

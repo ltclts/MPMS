@@ -39,6 +39,34 @@ func InitConfig() {
 	log.Info("数据库配置初始化结束", ConCount, MaxConCount, MaxWaitTimeOut)
 }
 
+var checking = false
+
+func CheckAndRefreshCon() error {
+	if checking {
+		return helper.CreateNewError("请勿重复操作")
+	}
+	checking = true
+	count := len(ConPools)
+	checkCount := count
+	releaseCount := 0
+	for count > 0 {
+		count--
+		if con := <-ConPools; con != nil {
+			if err := con.Test(); err != nil {
+				//如果连接不可用 则释放
+				_ = con.db.Close()
+				releaseCount++
+				continue
+			}
+			//再放入连接池
+			ConPools <- con
+		}
+	}
+	checking = false
+	log.Info(fmt.Sprintf("刷新连接池，检查数量 = %d，释放数量 = %d", checkCount, releaseCount))
+	return nil
+}
+
 //测试连通
 func (con *Con) Test() error {
 	_, err := con.db.Query(TestSql)
@@ -146,6 +174,7 @@ func initCon() (con *Con, err error) {
 		ConCount--
 		return con, err
 	}
+	log.Info("创建连接", ConCount)
 	con = new(Con)
 	con.db = db
 	con.lastLiveTime = time.Now()

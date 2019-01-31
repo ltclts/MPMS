@@ -36,7 +36,9 @@ const (
 	ApiUriMiniProgramVersionUpload = "/api/mini_program_version/upload" //小程序版本-轮播图上传
 	ApiUriMiniProgramVersionGet    = "/api/mini_program_version/get"    //小程序版本-获取版本数据
 
-	ApiUriMpOutPageConfigRequest = "/api/mp/out/page_config_request"
+	ApiUriMpOutInfoGet = "/api/mp/out/info_get"
+
+	ApiUriHelperRefreshDBConPools = "/api/helper/refresh_db_con_pools"
 )
 
 //不需要登陆的路由
@@ -45,6 +47,6 @@ func GetUnCheckLoginUris() []string {
 		HtmlUriUserLogin,
 		ApiUriUserLogin,
 
-		ApiUriMpOutPageConfigRequest,
+		ApiUriMpOutInfoGet,
 	}
 }
