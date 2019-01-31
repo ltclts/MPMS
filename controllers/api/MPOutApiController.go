@@ -3,6 +3,7 @@ package api
 import (
 	"MPMS/models"
 	"MPMS/structure"
+	"encoding/json"
 )
 
 /**
@@ -82,14 +83,18 @@ func (mp *MPOutApiController) RequestInfo() {
 			return
 		}
 
-		rspInfo := structure.StringToObjectMap{"Version": version, "Type": models.MiniProgramVersionBusinessCard}
-		for indexList, itemList := range map[string][]models.Resource{"ShareImgList": shareImgList, "CarouselImgList": carouselImgList, "ElegantDemeanorImgList": elegantDemeanorImgList} {
-			var itemCopyList []structure.StringToObjectMap
+		var content = structure.StringToObjectMap{}
+		_ = json.Unmarshal([]byte(version.Content), &content)
+		content["share_words"] = version.ShareWords
+		rspInfo := structure.StringToObjectMap{"version": content, "type": models.MiniProgramVersionBusinessCard}
+		for indexList, itemList := range map[string][]models.Resource{
+			"share_img_list":            shareImgList,
+			"carousel_img_list":         carouselImgList,
+			"elegant_demeanor_img_list": elegantDemeanorImgList,
+		} {
+			var itemCopyList []string
 			for _, item := range itemList {
-				var itemCopy = structure.StringToObjectMap{}
-				itemCopy["Id"] = item.Id
-				itemCopy["Path"] = item.GetRealPath()
-				itemCopyList = append(itemCopyList, itemCopy)
+				itemCopyList = append(itemCopyList, item.GetRealPath())
 			}
 			rspInfo[indexList] = itemCopyList
 		}
