@@ -37,6 +37,30 @@ func InitConfig() {
 	_ = QueryMaxCount()
 	_ = QueryMaxWaitTimeOut()
 	log.Info("数据库配置初始化结束", ConCount, MaxConCount, MaxWaitTimeOut)
+	checkAndRefreshConLoop()
+}
+
+func checkAndRefreshConLoop() {
+	spaceTime, err := beego.AppConfig.Float("db.refresh.time")
+	if err != nil {
+		log.Info("主动刷新连接池开启失败", err.Error())
+		return
+	}
+
+	log.Info("主动刷新连接池开启", spaceTime)
+	var lastCheckTime = time.Now()
+	for true {
+		if time.Now().Sub(lastCheckTime).Seconds() > spaceTime {
+			log.Info("刷新连接池")
+			_ = CheckAndRefreshCon()
+			lastCheckTime = time.Now()
+		}
+
+		if sleepTime := spaceTime - time.Now().Sub(lastCheckTime).Seconds(); spaceTime > 0 {
+			log.Info("主动刷新连接池等待中", sleepTime)
+			time.Sleep(time.Duration(spaceTime) * time.Second)
+		}
+	}
 }
 
 var checking = false
