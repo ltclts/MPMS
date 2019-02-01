@@ -77,6 +77,20 @@
                     <input type="text" class="form-control" name="address" placeholder="联系地址"
                            maxlength="100">
                 </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default"
+                                type="button">地图密钥</button></span>
+                    <input type="text" class="form-control" name="map_key" placeholder="地图密钥"
+                           maxlength="100">
+                </div>
+                <div class="input-group col-sm-6 col-xs-12 col-sm-offset-3">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default"
+                                type="button">风采别名</button></span>
+                    <input type="text" class="form-control" name="column_other_name" placeholder="风采别名"
+                           maxlength="10">
+                </div>
             </section>
             <section class="items col-sm-12 col-xs-12 mt-10">
                 <header class="col-sm-offset-2">

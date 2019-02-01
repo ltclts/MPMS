@@ -157,12 +157,14 @@ type ElegantDemeanorInfo struct {
 }
 
 type VersionContentInfo struct {
-	Name    string `form:"param[content][name]"`
-	Flag    string `form:"param[content][flag]"`
-	Tel     string `form:"param[content][tel]"`
-	Address string `form:"param[content][address]"`
-	Lng     string `form:"param[content][lng]"`
-	Lat     string `form:"param[content][lat]"`
+	Name            string `form:"param[content][name]"`
+	Flag            string `form:"param[content][flag]"`
+	Tel             string `form:"param[content][tel]"`
+	Address         string `form:"param[content][address]"`
+	Lng             string `form:"param[content][lng]"`
+	Lat             string `form:"param[content][lat]"`
+	MapKey          string `form:"param[content][map_key]"`
+	ColumnOtherName string `form:"param[content][column_other_name]"`
 }
 
 type MpVersionEditReq struct {
@@ -224,12 +226,14 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 			"creator_id":      creatorId,
 			"share_words":     shareInfo.ShareWords,
 			"content": structure.StringToObjectMap{
-				"name":    req.VersionContentInfo.Name,
-				"flag":    req.VersionContentInfo.Flag,
-				"address": req.VersionContentInfo.Address,
-				"tel":     req.VersionContentInfo.Tel,
-				"lng":     req.VersionContentInfo.Lng,
-				"lat":     req.VersionContentInfo.Lat,
+				"name":              req.VersionContentInfo.Name,
+				"flag":              req.VersionContentInfo.Flag,
+				"address":           req.VersionContentInfo.Address,
+				"tel":               req.VersionContentInfo.Tel,
+				"lng":               req.VersionContentInfo.Lng,
+				"lat":               req.VersionContentInfo.Lat,
+				"map_key":           req.VersionContentInfo.MapKey,
+				"column_other_name": req.VersionContentInfo.ColumnOtherName,
 			},
 			"is_deleted": models.UnDeleted,
 		}
@@ -249,12 +253,14 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 		toUpdate := structure.StringToObjectMap{
 			"share_words": shareInfo.ShareWords,
 			"content": structure.StringToObjectMap{
-				"name":    req.VersionContentInfo.Name,
-				"flag":    req.VersionContentInfo.Flag,
-				"address": req.VersionContentInfo.Address,
-				"tel":     req.VersionContentInfo.Tel,
-				"lng":     req.VersionContentInfo.Lng,
-				"lat":     req.VersionContentInfo.Lat,
+				"name":              req.VersionContentInfo.Name,
+				"flag":              req.VersionContentInfo.Flag,
+				"address":           req.VersionContentInfo.Address,
+				"tel":               req.VersionContentInfo.Tel,
+				"lng":               req.VersionContentInfo.Lng,
+				"lat":               req.VersionContentInfo.Lat,
+				"map_key":           req.VersionContentInfo.MapKey,
+				"column_other_name": req.VersionContentInfo.ColumnOtherName,
 			},
 		}
 		where := structure.StringToObjectMap{"id": req.Id}

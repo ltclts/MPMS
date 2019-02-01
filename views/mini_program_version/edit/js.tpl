@@ -30,7 +30,7 @@
         error:{{.Error}},
         notDeal: true,
         map: null,
-        contentFields: ['name', 'flag', 'tel', 'address', 'lng', 'lat'],
+        contentFields: ['name', 'flag', 'tel', 'address', 'lng', 'lat','map_key','column_other_name'],
         init: function () {
             this.render();
         },
