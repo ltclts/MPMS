@@ -36,7 +36,7 @@ func (b *Controller) RenderHtml(title string, pageName string, tplName string, h
 	b.Data["MapScriptSrc"] = fmt.Sprintf(`http://api.map.baidu.com/api?v=3.0&ak=%s`, beego.AppConfig.String("map.key"))
 	company, err := b.getSessionCompanyInfo()
 	if err != nil {
-		b.Data["CompanyName"] = "两分钱"
+		b.Data["CompanyName"] = beego.AppConfig.String("company.name")
 	} else {
 		b.Data["CompanyName"] = company.Name
 	}
