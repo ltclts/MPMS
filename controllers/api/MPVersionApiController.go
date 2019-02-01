@@ -222,7 +222,7 @@ func (mpv *MPVersionApiController) businessCardEdit(req MpVersionEditReq) (mpvIn
 		toInsert := structure.StringToObjectMap{
 			"mini_program_id": req.MpId,
 			"type":            req.Type,
-			"status":          models.MiniProgramVersionStatusApproved,
+			"status":          models.MiniProgramVersionStatusInit,
 			"creator_id":      creatorId,
 			"share_words":     shareInfo.ShareWords,
 			"content": structure.StringToObjectMap{
@@ -431,4 +431,105 @@ func (mpv *MPVersionApiController) Upload() {
 	}
 
 	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{"url": url, "resource_id": resourceId}})
+}
+
+func (mpv *MPVersionApiController) UpdateStatus() {
+	req := struct {
+		Id   int64 `form:"id"`
+		To   uint8 `form:"to_status"`
+		From uint8 `form:"from_status"`
+	}{}
+	if err := mpv.ParseForm(&req); err != nil {
+		mpv.ApiReturn(structure.Response{Error: 1, Msg: "参数解析失败！", Info: structure.StringToObjectMap{}})
+		return
+	}
+	operatorId := mpv.GetSession(session.UUID).(int64)
+	mpvIns := models.MiniProgramVersion{}
+	mpvIns, err := mpvIns.SelectOne([]string{"id", "mini_program_id"}, structure.StringToObjectMap{
+		"is_deleted": models.UnDeleted,
+		"id":         req.Id,
+		"status":     req.From,
+	})
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 2, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+	if mpvIns.Id == 0 {
+		mpv.ApiReturn(structure.Response{Error: 3, Msg: "没有获取到版本信息，请刷新重试", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	_, err = mpvIns.StartTrans()
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 4, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	flow := models.Flow{}
+	//如果是上线 则需要先把该小程序下的其他在线版本置为下线
+	if req.To == models.MiniProgramVersionStatusOnline {
+		toUpdate := structure.StringToObjectMap{"status": models.MiniProgramVersionStatusOffline}
+		where := structure.StringToObjectMap{
+			"mini_program_id": mpvIns.MiniProgramId,
+			"status":          models.MiniProgramVersionStatusOnline,
+			"is_deleted":      models.UnDeleted,
+		}
+		_, err = mpvIns.Update(toUpdate, where)
+		if err != nil {
+			_ = mpvIns.Rollback()
+			mpv.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			return
+		}
+
+		_, err = flow.Insert(
+			mpvIns.MiniProgramId,
+			models.FlowReferTypeMPMPV,
+			models.FlowStatusEdit,
+			operatorId,
+			structure.StringToObjectMap{
+				"toUpdate": toUpdate, "where": where,
+			})
+
+		if err != nil {
+			_ = mpvIns.Rollback()
+			mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			return
+		}
+	}
+
+	toUpdate := structure.StringToObjectMap{"status": req.To}
+	where := structure.StringToObjectMap{
+		"id":         mpvIns.Id,
+		"status":     req.From,
+		"is_deleted": models.UnDeleted,
+	}
+	_, err = mpvIns.Update(toUpdate, where)
+	if err != nil {
+		_ = mpvIns.Rollback()
+		mpv.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	_, err = flow.Insert(
+		mpvIns.Id,
+		models.FlowReferTypeMinProgramVersion,
+		models.FlowStatusEdit,
+		operatorId,
+		structure.StringToObjectMap{
+			"toUpdate": toUpdate, "where": where,
+		})
+
+	if err != nil {
+		_ = mpvIns.Rollback()
+		mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	err = mpvIns.Commit()
+	if err != nil {
+		mpv.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	mpv.ApiReturn(structure.Response{Error: 0, Msg: "ok", Info: structure.StringToObjectMap{}})
 }

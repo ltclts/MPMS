@@ -31,10 +31,11 @@ const (
 	ApiUriMiniProgramList = "/api/mini_program/list" //小程序列表
 	ApiUriMiniProgramEdit = "/api/mini_program/edit" //小程序-创建/编辑
 
-	ApiUriMiniProgramVersionList   = "/api/mini_program_version/list"   //小程序版本列表
-	ApiUriMiniProgramVersionEdit   = "/api/mini_program_version/edit"   //小程序版本-创建/编辑
-	ApiUriMiniProgramVersionUpload = "/api/mini_program_version/upload" //小程序版本-轮播图上传
-	ApiUriMiniProgramVersionGet    = "/api/mini_program_version/get"    //小程序版本-获取版本数据
+	ApiUriMiniProgramVersionList         = "/api/mini_program_version/list"          //小程序版本列表
+	ApiUriMiniProgramVersionEdit         = "/api/mini_program_version/edit"          //小程序版本-创建/编辑
+	ApiUriMiniProgramVersionUpload       = "/api/mini_program_version/upload"        //小程序版本-轮播图上传
+	ApiUriMiniProgramVersionGet          = "/api/mini_program_version/get"           //小程序版本-获取版本数据
+	ApiUriMiniProgramVersionUpdateStatus = "/api/mini_program_version/update_status" //小程序版本-获取版本数据
 
 	ApiUriMpOutInfoGet = "/api/mp/out/info_get"
 

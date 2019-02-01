@@ -30,7 +30,7 @@
         error:{{.Error}},
         notDeal: true,
         map: null,
-        contentFields: ['name', 'flag', 'tel', 'address', 'lng', 'lat','map_key','column_other_name'],
+        contentFields: ['name', 'flag', 'tel', 'address', 'lng', 'lat', 'map_key', 'column_other_name'],
         init: function () {
             this.render();
         },
@@ -217,22 +217,24 @@
 
             if (1 === +_this.$type.val()) {
                 _this.$businessCardInfo.removeClass('hidden');
-                _this.renderUploader();
                 _this.renderMap();
+
+                if (1 === _this.operateType) {
+                    //创建
+                    _this.renderUploader();
+
+                }
+
+                if (2 === _this.operateType) {
+                    _this.$btnEdit.attr("title", "保存");
+                    _this.$btnEdit.html("保存");
+
+                    //获取公司数据
+                    _this.initHtmlInfo();
+                }
             }
 
-            if (1 === _this.operateType) {
 
-
-            }
-
-            if (2 === _this.operateType) {
-                _this.$btnEdit.attr("title", "保存");
-                _this.$btnEdit.html("保存");
-
-                //获取公司数据
-                _this.initHtmlInfo();
-            }
         },
         initHtmlInfo: function () {
             let _this = this;
@@ -249,6 +251,29 @@
                     return false;
                 }
 
+                let item = resp.info.Version || {};
+                _this.mpId = item.MpId || 0;
+                _this.id = item.Id || 0;
+                _this.$shareWords.val(item.ShareWords || "");
+                let content = JSON.parse(item.Content);
+                _this.mapTo(content.lng, content.lat, true);
+                console.log(content);
+                _this.contentFields.forEach(function (name) {
+                    $('input[name="' + name + '"]').val(content[name]);
+                });
+
+                if (+item.Status !== 0) {
+                    //非初始状态 将被禁用所有编辑
+                    $.each($('input'), function () {
+                        $(this).attr('disabled', true);
+                    });
+                    $.each($('button'), function () {
+                        $(this).attr('disabled', true);
+                    });
+                } else {
+                    _this.renderUploader();
+                }
+
                 let carouselImgList = resp.info.CarouselImgList || [];
                 carouselImgList.forEach(function (v) {
                     _this.renderCarouselImg(v.Id, v.Path, false);
@@ -262,17 +287,6 @@
                 let elegantDemeanorImgList = resp.info.ElegantDemeanorImgList || [];
                 elegantDemeanorImgList.forEach(function (v) {
                     _this.renderElegantDemeanorImg(v.Id, v.Path, false);
-                });
-
-                let item = resp.info.Version || {};
-                _this.mpId = item.MpId || 0;
-                _this.id = item.Id || 0;
-                _this.$shareWords.val(item.ShareWords || "");
-                let content = JSON.parse(item.Content);
-                _this.mapTo(content.lng, content.lat, true);
-                console.log(content);
-                _this.contentFields.forEach(function (name) {
-                    $('input[name="' + name + '"]').val(content[name]);
                 });
             });
         },

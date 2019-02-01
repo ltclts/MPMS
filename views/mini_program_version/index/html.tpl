@@ -10,6 +10,15 @@
             <a href="javascript:void(0)" class="btn btn-sm btn-edit disabled" title="版本编辑">
                 编辑
             </a>
+            <a href="javascript:void(0)" class="btn btn-sm btn-approving disabled" title="提交审核">
+                提交审核
+            </a>
+            <a href="javascript:void(0)" class="btn btn-sm btn-online disabled" title="上线">
+                上线
+            </a>
+            <a href="javascript:void(0)" class="btn btn-sm btn-offline disabled" title="下线">
+                下线
+            </a>
         </div>
 
         <div class="mt-10">

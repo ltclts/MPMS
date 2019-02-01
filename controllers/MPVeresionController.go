@@ -51,6 +51,7 @@ func (mpv *MPVersionController) Index() {
 	}{}
 	_ = mpv.ParseForm(&req)
 	mpv.Data["ApiUriMiniProgramVersionList"] = uris.ApiUriMiniProgramVersionList
+	mpv.Data["ApiUriMiniProgramVersionUpdateStatus"] = uris.ApiUriMiniProgramVersionUpdateStatus
 	mpv.Data["HtmlUriMiniProgramVersionEdit"] = uris.HtmlUriMiniProgramVersionEdit                                           //编辑页面
 	mpv.Data["HtmlUriMiniProgramVersionCreate"] = fmt.Sprintf("%s?mp_id=%d", uris.HtmlUriMiniProgramVersionCreate, req.MpId) //创建页面
 	mpv.Data["MpId"] = req.MpId
