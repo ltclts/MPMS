@@ -3,12 +3,15 @@
     let mpv = {
         id: +{{.Id}},
         mpId: +{{.MpId}},
+        userType:+{{.UserType}},
         operateType: +{{.OperateType}},
         urlHtmlMiniProgramVersionEdit:{{.HtmlUriMiniProgramVersionEdit}},
         urlApiMiniProgramVersionGet:{{.ApiUriMiniProgramVersionGet}},
         urlApiMiniProgramVersionUpload:{{.ApiUriMiniProgramVersionUpload}},
         urlApiMiniProgramVersionEdit:{{.ApiUriMiniProgramVersionEdit}},
+        urlApiMiniProgramVersionUpdateStatus:{{.ApiUriMiniProgramVersionUpdateStatus}},
         $btnEdit: $('.btn-edit'),
+        $approve:$('.common-approve'),
         $type: $('select[name="type"]'),
         $shareWords: $('input[name="share-words"]'),
         $businessCardInfo: $('.business-card-info'),
@@ -59,7 +62,37 @@
                     }
                     console.log(_this.currentShareImgCount);
                 });
+            }).on('click', '.btn-approved', function () {
+                _this.updateStatus(1, 2, _this.id)
+            }).on('click', '.btn-back', function () {
+                _this.updateStatus(1, 0, _this.id)
             });
+        },
+        updateStatus: function (from_status, to_status, id) {
+            let _this = this;
+            let statusToActNamesMap = {
+                0: '确认打回？',
+                2: '确认通过？',
+            };
+            if (!statusToActNamesMap[to_status]) {
+                return;
+            }
+            layer.dangerConfirm(statusToActNamesMap[to_status], function () {
+                layer.ajax({
+                    url: _this.urlApiMiniProgramVersionUpdateStatus,
+                    type: 'post',
+                    data: {id: id, to_status: to_status, from_status: from_status}
+                }, {loadingText: "操作处理中..."}).done(function (resp) {
+                    if (0 !== +resp.error) {
+                        layer.popupError("操作处理失败！" + resp.msg);
+                        return false;
+                    }
+                    layer.popupMsg("操作成功！");
+                    setTimeout(function(){
+                        location.reload();
+                    },500)
+                });
+            })
         },
         renderMap: function () {
             let _this = this;
@@ -262,6 +295,7 @@
                     $('input[name="' + name + '"]').val(content[name]);
                 });
 
+                console.log(item);
                 if (+item.Status !== 0) {
                     //非初始状态 将被禁用所有编辑
                     $.each($('input'), function () {
@@ -270,8 +304,13 @@
                     $.each($('button'), function () {
                         $(this).attr('disabled', true);
                     });
+                    _this.$btnEdit.addClass('hidden');
                 } else {
                     _this.renderUploader();
+                }
+
+                if (+item.Status === 1 && _this.userType === 0){
+                    _this.$approve.removeClass('hidden');
                 }
 
                 let carouselImgList = resp.info.CarouselImgList || [];

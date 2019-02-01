@@ -465,6 +465,11 @@ func (mpv *MPVersionApiController) UpdateStatus() {
 		return
 	}
 
+	if req.To == models.MiniProgramVersionStatusApproved && mpv.GetSession(session.UserType).(uint8) == models.UserTypeCustomer { //如果是审核 并且当前任务是客户
+		mpv.ApiReturn(structure.Response{Error: 5, Msg: "您没有审核权限！", Info: structure.StringToObjectMap{}})
+		return
+	}
+
 	flow := models.Flow{}
 	//如果是上线 则需要先把该小程序下的其他在线版本置为下线
 	if req.To == models.MiniProgramVersionStatusOnline {
@@ -477,7 +482,7 @@ func (mpv *MPVersionApiController) UpdateStatus() {
 		_, err = mpvIns.Update(toUpdate, where)
 		if err != nil {
 			_ = mpvIns.Rollback()
-			mpv.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 
@@ -492,7 +497,7 @@ func (mpv *MPVersionApiController) UpdateStatus() {
 
 		if err != nil {
 			_ = mpvIns.Rollback()
-			mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			mpv.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 	}
@@ -506,7 +511,7 @@ func (mpv *MPVersionApiController) UpdateStatus() {
 	_, err = mpvIns.Update(toUpdate, where)
 	if err != nil {
 		_ = mpvIns.Rollback()
-		mpv.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 8, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 
@@ -521,13 +526,13 @@ func (mpv *MPVersionApiController) UpdateStatus() {
 
 	if err != nil {
 		_ = mpvIns.Rollback()
-		mpv.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 9, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 
 	err = mpvIns.Commit()
 	if err != nil {
-		mpv.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		mpv.ApiReturn(structure.Response{Error: 10, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 

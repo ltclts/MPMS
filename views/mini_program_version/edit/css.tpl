@@ -27,4 +27,11 @@
         height: 320px;
         width: 100%;
     }
+
+    .common-approve{
+        z-index: 9999;
+        position: fixed ! important;
+        bottom: 10%;
+        left: 70%;
+    }
 </style>

@@ -3,6 +3,16 @@
         <h3>{{.Title}}</h3>
     </div>
     <div class="panel-body">
+        <div class="list common-approve col-sm-12 col-xs-12 hidden">
+            <div class="input-group btn-group col-sm-6 col-xs-12  col-sm-offset-1">
+                <a class="btn btn-danger btn-back" title="打回">
+                    打回
+                </a>
+                <a class="btn btn-primary btn-approved" title="通过">
+                    通过
+                </a>
+            </div>
+        </div>
         <div class="list common-content col-sm-12 col-xs-12">
             <header class="col-sm-offset-1">
                 <h2>类型选择</h2>
