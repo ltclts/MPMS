@@ -34,4 +34,11 @@
         bottom: 10%;
         left: 70%;
     }
+
+    .btn-edit{
+        z-index: 9999;
+        position: fixed ! important;
+        top: 18%;
+        left: 80%;
+    }
 </style>

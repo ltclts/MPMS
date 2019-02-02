@@ -153,7 +153,7 @@
         </div>
         <div class="list common-content col-sm-12 col-xs-12">
             <div class="input-group btn-group col-sm-6 col-xs-12  col-sm-offset-1">
-                <a class="btn btn-info btn-edit" title="创建">
+                <a class="btn btn-primary btn-edit" title="创建">
                     <i class="icon icon-plus"></i>创建
                 </a>
             </div>
