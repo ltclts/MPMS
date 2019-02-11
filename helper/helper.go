@@ -45,6 +45,11 @@ func NowHour() string {
 	return time.Now().Format("15")
 }
 
+func ParseDateTime(dateTime string) (time.Time, error) {
+	local, _ := time.LoadLocation("Local")
+	return time.ParseInLocation("2006-01-02 15:04:05", dateTime, local)
+}
+
 func Md5(str string) string {
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(str))

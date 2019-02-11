@@ -26,7 +26,7 @@ const (
 
 func CompanyStatusToNameMap() structure.Uint8ToStringMap {
 	return structure.Uint8ToStringMap{
-		CompanyStatusInit:      "已创建",
+		CompanyStatusInit:      "编辑中",
 		CompanyStatusInUse:     "已启用",
 		CompanyStatusForbidden: "已禁用",
 	}

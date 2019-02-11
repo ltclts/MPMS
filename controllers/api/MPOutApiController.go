@@ -1,9 +1,11 @@
 package api
 
 import (
+	"MPMS/helper"
 	"MPMS/models"
 	"MPMS/structure"
 	"encoding/json"
+	"time"
 )
 
 /**
@@ -45,15 +47,43 @@ func (mp *MPOutApiController) RequestInfo() {
 		return
 	}
 
-	version := models.MiniProgramVersion{}
-	version, err = version.SelectOne([]string{}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "mini_program_id": program.Id, "status": models.MiniProgramVersionStatusOnline})
+	company := models.Company{}
+	company, err = company.SelectOne([]string{}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "id": program.CompanyId})
 	if err != nil {
 		mp.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 		return
 	}
 
+	if company.Id == 0 {
+		mp.ApiReturn(structure.Response{Error: 6, Msg: "没有获取到公司信息", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if company.Status != models.CompanyStatusInUse {
+		mp.ApiReturn(structure.Response{Error: 7, Msg: "您尚无操作权限", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	expireAt, err := helper.ParseDateTime(company.ExpireAt)
+	if err != nil {
+		mp.ApiReturn(structure.Response{Error: 8, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	if time.Now().Sub(expireAt).Seconds() > 0 {
+		mp.ApiReturn(structure.Response{Error: 9, Msg: "您的使用已到期", Info: structure.StringToObjectMap{}})
+		return
+	}
+
+	version := models.MiniProgramVersion{}
+	version, err = version.SelectOne([]string{}, structure.StringToObjectMap{"is_deleted": models.UnDeleted, "mini_program_id": program.Id, "status": models.MiniProgramVersionStatusOnline})
+	if err != nil {
+		mp.ApiReturn(structure.Response{Error: 10, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+		return
+	}
+
 	if version.Id == 0 {
-		mp.ApiReturn(structure.Response{Error: 6, Msg: "没有获取到小程序版本信息", Info: structure.StringToObjectMap{}})
+		mp.ApiReturn(structure.Response{Error: 11, Msg: "没有获取到小程序版本信息", Info: structure.StringToObjectMap{}})
 		return
 	}
 
@@ -65,21 +95,21 @@ func (mp *MPOutApiController) RequestInfo() {
 		whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionSharedImg
 		shareImgList, err := resource.Select(fields, whereResource)
 		if err != nil {
-			mp.ApiReturn(structure.Response{Error: 5, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			mp.ApiReturn(structure.Response{Error: 12, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 
 		whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionBusinessCardCarousel
 		carouselImgList, err := resource.Select(fields, whereResource)
 		if err != nil {
-			mp.ApiReturn(structure.Response{Error: 6, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			mp.ApiReturn(structure.Response{Error: 13, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 
 		whereResource["refer_type"] = models.ResourceReferTypeMiniProgramVersionBusinessCardElegantDemeanor
 		elegantDemeanorImgList, err := resource.Select(fields, whereResource)
 		if err != nil {
-			mp.ApiReturn(structure.Response{Error: 7, Msg: err.Error(), Info: structure.StringToObjectMap{}})
+			mp.ApiReturn(structure.Response{Error: 14, Msg: err.Error(), Info: structure.StringToObjectMap{}})
 			return
 		}
 
@@ -103,5 +133,5 @@ func (mp *MPOutApiController) RequestInfo() {
 		return
 	}
 
-	mp.ApiReturn(structure.Response{Error: 7, Msg: "未找到任何信息", Info: structure.StringToObjectMap{}})
+	mp.ApiReturn(structure.Response{Error: 15, Msg: "未找到任何信息", Info: structure.StringToObjectMap{}})
 }
