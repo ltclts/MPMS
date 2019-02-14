@@ -2,6 +2,7 @@ package db
 
 import (
 	"MPMS/helper"
+	"MPMS/services/job"
 	"MPMS/services/log"
 	"database/sql"
 	"fmt"
@@ -47,20 +48,11 @@ func checkAndRefreshConLoop() {
 		return
 	}
 
-	log.Info("主动刷新连接池开启", spaceTime)
-	var lastCheckTime = time.Now()
-	for true {
-		if time.Now().Sub(lastCheckTime).Seconds() > spaceTime {
-			log.Info("刷新连接池")
-			_ = CheckAndRefreshCon()
-			lastCheckTime = time.Now()
-		}
-
-		if sleepTime := spaceTime - time.Now().Sub(lastCheckTime).Seconds(); spaceTime > 0 {
-			log.Info("主动刷新连接池等待中", sleepTime)
-			time.Sleep(time.Duration(spaceTime) * time.Second)
-		}
-	}
+	//定时刷新
+	job.Run(func() {
+		log.Info("刷新连接池", spaceTime)
+		_ = CheckAndRefreshCon()
+	}, spaceTime)
 }
 
 var checking = false

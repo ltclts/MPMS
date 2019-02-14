@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
+	"reflect"
 	"strings"
 )
 
@@ -233,8 +234,19 @@ func (b *Model) renderWhere(where structure.StringToObjectMap) (string, structur
 	var whereValue structure.Array
 	whereIndex = append(whereIndex, " 1=1 ")
 	for i, v := range where {
-		whereIndex = append(whereIndex, fmt.Sprintf(" `%s`= ? ", i))
-		whereValue = append(whereValue, v)
+		switch v.(type) {
+		case structure.Array:
+			arr := reflect.ValueOf(v).Interface().(structure.Array)
+			if len(arr) != 2 {
+				panic("require two params")
+			}
+			whereIndex = append(whereIndex, fmt.Sprintf(" `%s` %s ? ", i, arr[0]))
+			whereValue = append(whereValue, arr[1])
+		default:
+			whereIndex = append(whereIndex, fmt.Sprintf(" `%s`= ? ", i))
+			whereValue = append(whereValue, v)
+		}
+
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
@@ -244,8 +256,18 @@ func (b *Model) renderWhereDirectly(where structure.StringToObjectMap) (string, 
 	var whereValue structure.Array
 	whereIndex = append(whereIndex, " 1=1 ")
 	for i, v := range where {
-		whereIndex = append(whereIndex, fmt.Sprintf(" %s= ? ", i))
-		whereValue = append(whereValue, v)
+		switch v.(type) {
+		case structure.Array:
+			arr := reflect.ValueOf(v).Interface().(structure.Array)
+			if len(arr) != 2 {
+				panic("require two params")
+			}
+			whereIndex = append(whereIndex, fmt.Sprintf(" %s %s ? ", i, arr[0]))
+			whereValue = append(whereValue, arr[1])
+		default:
+			whereIndex = append(whereIndex, fmt.Sprintf(" %s= ? ", i))
+			whereValue = append(whereValue, v)
+		}
 	}
 	return strings.Join(whereIndex, "and"), whereValue
 }
