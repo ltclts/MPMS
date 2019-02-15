@@ -38,6 +38,7 @@ const (
 	//删除标志
 	UnDeleted = 0
 	Deleted   = 1
+	Removed   = 2
 )
 
 /**

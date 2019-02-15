@@ -50,7 +50,7 @@ func Upload(f multipart.File, h *multipart.FileHeader, dir string) (url string, 
 
 func Remove() {
 	dealDate := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
-	log.Info(fmt.Sprintf("清理 %s 之前的未使用的资源数据", dealDate))
+	log.Info(fmt.Sprintf("清理 %s 之前未使用的资源数据", dealDate))
 	resource := models.Resource{}
 	unusedWhere := structure.StringToObjectMap{
 		"refer_id":   0,
@@ -58,7 +58,6 @@ func Remove() {
 		"is_deleted": models.UnDeleted,
 	}
 	deletedWhere := structure.StringToObjectMap{
-		"created_at": structure.Array{"<", dealDate},
 		"is_deleted": models.Deleted,
 	}
 	unusedResourceList, err := resource.Select([]string{}, unusedWhere)
@@ -73,16 +72,20 @@ func Remove() {
 		return
 	}
 
-	fmt.Println(unusedResourceList, deletedResourceList)
-	//var bucket *oss.Bucket
-	//var err error
-	//
-	//
-	//
-	//bucket, err = getBucket(ossBucketName)
-	//
-	// bucket.DeleteObject(url)
+	bucket, err := getBucket(ossBucketName)
+	if err != nil {
+		log.Err("获取 bucket 信息失败", err.Error())
+		return
+	}
 
+	for _, list := range [][]models.Resource{unusedResourceList, deletedResourceList} {
+		for _, item := range list {
+			if err = bucket.DeleteObject(item.RelativePath); err == nil {
+				log.Info("删除未使用资源", item)
+				_, _ = resource.Update(structure.StringToObjectMap{"is_deleted": models.Removed}, structure.StringToObjectMap{"id": item.Id})
+			}
+		}
+	}
 }
 
 func getBucket(bucketName string) (*oss.Bucket, error) {
