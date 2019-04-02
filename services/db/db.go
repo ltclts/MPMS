@@ -7,8 +7,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/astaxie/beego"
+	_ "github.com/go-sql-driver/mysql" // import your used driver
 	"github.com/petermattis/goid"
 	"runtime/debug"
+	"sync"
 	"time"
 )
 
@@ -19,7 +21,8 @@ const (
 )
 
 var ConCount = 0 //当前DB连接数
-var UerToConMap map[int64]*Con
+var UserToConMap map[int64]*Con
+var UserToConMapLock sync.Mutex
 
 var MaxConCount = 200    //默认最大连接数
 var MaxWaitTimeOut = 300 //超时时间
@@ -49,10 +52,10 @@ func checkAndRefreshConLoop() {
 	}
 
 	//定时刷新
-	job.Run(func() {
+	job.PollingListRun(job.Polling{Callable: func() {
 		log.Info("刷新连接池", spaceTime)
 		_ = CheckAndRefreshCon()
-	}, spaceTime)
+	}, Seconds: spaceTime})
 }
 
 var checking = false
@@ -145,8 +148,10 @@ func QueryMaxWaitTimeOut() error {
 }
 
 func connect() (con *Con, err error) {
+	UserToConMapLock.Lock()
+	defer UserToConMapLock.Unlock()
 	unique := goid.Get()
-	if con = UerToConMap[unique]; con != nil {
+	if con = UserToConMap[unique]; con != nil {
 		con.lastLiveTime = time.Now()
 		return con, nil
 	} else {
@@ -160,7 +165,7 @@ func connect() (con *Con, err error) {
 				}
 
 				con.lastLiveTime = time.Now()
-				UerToConMap[unique] = con
+				UserToConMap[unique] = con
 				return con, nil
 			}
 		}
@@ -175,10 +180,11 @@ func connect() (con *Con, err error) {
 			return con, err
 		}
 
-		if UerToConMap == nil {
-			UerToConMap = map[int64]*Con{}
+		if UserToConMap == nil {
+			UserToConMap = map[int64]*Con{}
 		}
-		UerToConMap[unique] = con
+
+		UserToConMap[unique] = con
 		return con, nil
 	}
 }
@@ -205,13 +211,17 @@ func Release() error {
 		return err
 	}
 
-	delete(UerToConMap, goid.Get())
+	UserToConMapLock.Lock()
+	defer UserToConMapLock.Unlock()
+	delete(UserToConMap, goid.Get())
 	ConPools <- con
 	return nil
 }
 
 func (con *Con) release() error {
-	delete(UerToConMap, goid.Get())
+	UserToConMapLock.Lock()
+	defer UserToConMapLock.Unlock()
+	delete(UserToConMap, goid.Get())
 	ConPools <- con
 	return nil
 }

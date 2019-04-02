@@ -16,7 +16,7 @@ func init() {
 	go email.Listen()
 
 	//每天执行一次oss清理服务
-	job.Run(oss.Remove, 24*60*60)
+	job.CronListRun(job.Cron{Callable: oss.Remove, Spec: "0 0 0 * * ?"})
 }
 
 func main() {
