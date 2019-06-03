@@ -23,7 +23,7 @@ type queueInsInfo struct {
 const PackagePush = "package_push"
 
 var queueConfigs = map[string]queueConfigInfo{
-	PackagePush: {"wms_package_push_test", "wms_package_push_test", "amqp://liuzhaopeng:liuzhaopeng@192.168.1.248:5672/oms"},
+	PackagePush: {"*", "*", "*"},
 }
 
 var queuesIns = map[string]queueInsInfo{}
